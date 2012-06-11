@@ -16,6 +16,8 @@ public:
   PlbXmlController2D(std::string &fname);
   ~PlbXmlController2D();
 
+  IncomprFlowParam<T> getParams();
+
   plint i;
 
 private:
@@ -33,4 +35,10 @@ template<typename T>
 PlbXmlController2D<T>::~PlbXmlController2D()
 {
 
+}
+
+template<typename T>
+PlbXmlController2D<T>::getParams()
+{
+  
 }
