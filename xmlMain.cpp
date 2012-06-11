@@ -23,5 +23,9 @@ int main(int argc, char **argv)
 
   std::cout << p.i << std::endl;
 
+  IncomprFlowParam<T> param(p.getParams());
+
+  std::cout << param.getNx() << " " << param.getNy() << std::endl;
+
   return 0;
 }
