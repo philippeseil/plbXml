@@ -40,5 +40,5 @@ PlbXmlController2D<T>::~PlbXmlController2D()
 template<typename T>
 PlbXmlController2D<T>::getParams()
 {
-  
+   
 }
