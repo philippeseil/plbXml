@@ -22,13 +22,14 @@ public:
 
 private:
   XMLreader reader;
+  XMLreaderProxy plbCase;
 };
 
 template<typename T>
 PlbXmlController2D<T>::PlbXmlController2D(std::string &fname)
-  : reader(fname)
+  : reader(fname), plbCase(reader["plbCase"])
 {
-  reader["plbCase"]["test"].read(i);
+  plbCase["test"].read(i);
 }
 
 template<typename T>
@@ -38,7 +39,19 @@ PlbXmlController2D<T>::~PlbXmlController2D()
 }
 
 template<typename T>
-PlbXmlController2D<T>::getParams()
+IncomprFlowParam<T> PlbXmlController2D<T>::getParams()
 {
-   
+  XMLreaderProxy p(plbCase["parameters"]);
+  
+  T physU(1.),latticeU(0.),Re(0.),physLength(1.),lx(0.),ly(0.);
+  plint res(1);
+
+  p["latticeU"].read(latticeU);
+  p["Re"].read(Re);
+  p["lx"].read(lx);
+  p["ly"].read(ly);
+  p["Resolution"].read(res);
+
+  return IncomprFlowParam<T>(physU,latticeU,Re,physLength,res,lx,ly);
 }
+
