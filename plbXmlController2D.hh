@@ -43,6 +43,7 @@ void PlbXmlController2D<T>::buildRegionList()
     reg["y0"].read(y0);
     reg["y1"].read(y1);
     inserted = regionList.insert(Region2D(id,Box2D(x0,x1,y0,y1)));
+    // check for duplicated entry
     if(!inserted.second)
       std::cout << "Warning: Region with duplicate ID " 
 		<< id << " ignored" << std::endl;
