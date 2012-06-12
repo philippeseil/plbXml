@@ -21,5 +21,13 @@ int main(int argc, char **argv)
 
   PlbXmlController2D<T> p(fName);
 
+
+  std::string id("id");
+
+  PlbXmlController2D<T>::RegionList list(p.getRegionList());
+
+  std::cout << list.size() << std::endl;
+  for(PlbXmlController2D<T>::RegionListIterator it = list.begin(); it != list.end(); it++)
+    std::cout << (*it).first << std::endl;
   return 0;
 }

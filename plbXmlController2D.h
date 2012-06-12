@@ -3,10 +3,16 @@
  * provides an xml interface to palabos
  */
 
+#ifndef PBLXMLCONTROLLER_2D_LBDEM
+#define PBLXMLCONTROLLER_2D_LBDEM
+
 #include "palabos2D.h"
 #include "palabos2D.hh"
 
 #include <string>
+#include <list>
+#include <map>
+#include <utility>
 
 using namespace plb;
 
@@ -16,57 +22,26 @@ public:
   PlbXmlController2D(std::string &fname);
   ~PlbXmlController2D();
 
-  const IncomprFlowParam<T>& getParams() const;
+  typedef std::pair<std::string,Box2D> Region2D;
+  typedef std::map<std::string,Box2D> RegionList;
+  typedef std::map<std::string,Box2D>::iterator RegionListIterator;
 
-  plint i;
+  const IncomprFlowParam<T>& getParams() const;
+  const RegionList& getRegionList() const;
 
 private:
   IncomprFlowParam<T> calcParams();
+  void buildRegionList();
 
-
+  // here, order is highly important because of initialization!
   XMLreader reader;
   XMLreaderProxy plbCase;
   IncomprFlowParam<T> params;
+
+  RegionList regionList;
+
 };
 
-template<typename T>
-const IncomprFlowParam<T>&  PlbXmlController2D<T>::getParams() const
-{
-  return params;
-}
+#include "plbXmlController2D.hh"
 
-
-template<typename T>
-IncomprFlowParam<T> PlbXmlController2D<T>::calcParams()
-{
-  XMLreaderProxy p(plbCase["parameters"]);
-  
-  T physU(1.),latticeU(0.),Re(0.),physLength(1.),lx(0.),ly(0.);
-  plint res(1);
-
-  p["latticeU"].read(latticeU);
-  p["Re"].read(Re);
-  p["lx"].read(lx);
-  p["ly"].read(ly);
-  p["Resolution"].read(res);
-
-  return IncomprFlowParam<T>(physU,latticeU,Re,physLength,res,lx,ly);
-}
-
-
-
-
-template<typename T>
-PlbXmlController2D<T>::PlbXmlController2D(std::string &fname)
-  : reader(fname), plbCase(reader["plbCase"]),
-    params(this->calcParams())
-{
-  plbCase["test"].read(i);
-}
-
-template<typename T>
-PlbXmlController2D<T>::~PlbXmlController2D()
-{
-
-}
-
+#endif /* PBLXMLCONTROLLER_2D_LBDEM */
