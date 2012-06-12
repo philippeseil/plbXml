@@ -21,11 +21,5 @@ int main(int argc, char **argv)
 
   PlbXmlController2D<T> p(fName);
 
-  std::cout << p.i << std::endl;
-
-  IncomprFlowParam<T> param(p.getParams());
-
-  std::cout << param.getNx() << " " << param.getNy() << std::endl;
-
   return 0;
 }

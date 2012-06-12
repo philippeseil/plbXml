@@ -16,30 +16,28 @@ public:
   PlbXmlController2D(std::string &fname);
   ~PlbXmlController2D();
 
-  IncomprFlowParam<T> getParams();
+  const IncomprFlowParam<T>& getParams() const;
 
   plint i;
 
 private:
+  IncomprFlowParam<T> calcParams();
+
+
   XMLreader reader;
   XMLreaderProxy plbCase;
+  IncomprFlowParam<T> params;
 };
 
 template<typename T>
-PlbXmlController2D<T>::PlbXmlController2D(std::string &fname)
-  : reader(fname), plbCase(reader["plbCase"])
+const IncomprFlowParam<T>&  PlbXmlController2D<T>::getParams() const
 {
-  plbCase["test"].read(i);
+  return params;
 }
 
-template<typename T>
-PlbXmlController2D<T>::~PlbXmlController2D()
-{
-
-}
 
 template<typename T>
-IncomprFlowParam<T> PlbXmlController2D<T>::getParams()
+IncomprFlowParam<T> PlbXmlController2D<T>::calcParams()
 {
   XMLreaderProxy p(plbCase["parameters"]);
   
@@ -53,5 +51,22 @@ IncomprFlowParam<T> PlbXmlController2D<T>::getParams()
   p["Resolution"].read(res);
 
   return IncomprFlowParam<T>(physU,latticeU,Re,physLength,res,lx,ly);
+}
+
+
+
+
+template<typename T>
+PlbXmlController2D<T>::PlbXmlController2D(std::string &fname)
+  : reader(fname), plbCase(reader["plbCase"]),
+    params(this->calcParams())
+{
+  plbCase["test"].read(i);
+}
+
+template<typename T>
+PlbXmlController2D<T>::~PlbXmlController2D()
+{
+
 }
 
