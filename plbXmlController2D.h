@@ -22,6 +22,7 @@ public:
   PlbXmlController2D(std::string &fname);
   ~PlbXmlController2D();
 
+  // typedefs for regions
   typedef std::pair<std::string,Box2D> Region2D;
   typedef std::map<std::string,Box2D> RegionList;
   typedef std::map<std::string,Box2D>::iterator RegionListIterator;
