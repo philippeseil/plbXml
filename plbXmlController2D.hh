@@ -1,4 +1,6 @@
 
+using namespace Region;
+
 template<typename T>
 const IncomprFlowParam<T>&  PlbXmlController2D<T>::getParams() const
 {
@@ -6,8 +8,7 @@ const IncomprFlowParam<T>&  PlbXmlController2D<T>::getParams() const
 }
 
 template<typename T>
-const typename PlbXmlController2D<T>::RegionList&
-PlbXmlController2D<T>::getRegionList() const
+const RegionList& PlbXmlController2D<T>::getRegionList() const
 {
   return regionList;
 }
@@ -35,21 +36,18 @@ void PlbXmlController2D<T>::buildRegionList()
   std::pair<RegionListIterator,bool> inserted;
   XMLreaderProxy reg(plbCase["region"]);
   for( ; reg.isValid(); reg = reg.iterId() ){
-    std::string id;
-    plint x0,x1,y0,y1;
-    reg["id"].read(id);
-    reg["x0"].read(x0);
-    reg["x1"].read(x1);
-    reg["y0"].read(y0);
-    reg["y1"].read(y1);
-    inserted = regionList.insert(Region2D(id,Box2D(x0,x1,y0,y1)));
+    inserted = regionList.insert(regionFromXml(reg));
     // check for duplicated entry
     if(!inserted.second)
       std::cout << "Warning: Region with duplicate ID " 
-		<< id << " ignored" << std::endl;
+		<< (*inserted.first).first << " ignored" << std::endl;
   }
+}
 
-  
+template<typename T>
+void PlbXmlController2D<T>::buildActionList()
+{
+
 }
 
 template<typename T>

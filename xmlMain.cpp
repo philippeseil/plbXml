@@ -6,6 +6,7 @@
 #include "palabos2D.hh"
 
 #include "plbXmlController2D.h"
+#include "region2D.h"
 
 #include <string>
 #include <iostream>
@@ -24,10 +25,10 @@ int main(int argc, char **argv)
 
   std::string id("id");
 
-  PlbXmlController2D<T>::RegionList list(p.getRegionList());
+  Region::RegionList list(p.getRegionList());
 
   std::cout << list.size() << std::endl;
-  for(PlbXmlController2D<T>::RegionListIterator it = list.begin(); it != list.end(); it++)
+  for(Region::RegionListIterator it = list.begin(); it != list.end(); it++)
     std::cout << (*it).first << std::endl;
   return 0;
 }
