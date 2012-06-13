@@ -16,62 +16,33 @@ namespace Action{
   class ActionClass2D {
   public:
     ActionClass2D(plint i_) : i(i_) {}
+    //  ActionClass2D(ActionClass2D const &orig) : i(orig.i) {}
     plint get() { return i;}
   private:
-    plint i
+    plint i;
   };
-
-  class CompareActions {
-  public:
-    CompareActions(std::vector<std::string> &v_);
-    bool operator() (std::string const &lhs, std::string const &rhs);
-  private:
-    std::vector<std::string> v;
-    plint getIndex(std::string const &s);
-  };
-
-  
 
   typedef std::pair<std::string,ActionClass2D> Action2D;
-  typedef std::map<std::string,ActionClass2D,CompareActions> ActionList;
-  typedef std::map<std::string,ActionClass2D,CompareActions>::iterator ActionListIterator;
+  typedef std::map<std::string,ActionClass2D> ActionList;
+  typedef std::map<std::string,ActionClass2D>::iterator ActionListIterator;
   
-  typename Action2D actionFromXml(XMLreaderProxy const &a)
+  Action2D actionFromXml(XMLreaderProxy const &a)
   {
     std::string id;
     plint i;
-    a["id"].read(id);
+    try{
+      a["id"].read(id);
+    } catch (PlbIOException &e){
+      throw PlbIOException("Invalid Action command: No id specified!");
+    }
+    if(id.compare("") == 0)
+      throw PlbIOException("Invalid Action command: Unnamed Action");
+
+    // this is to be replaced by a creation of associated objects
     a["v"].read(i);
     return Action2D(id,ActionClass2D(i));
   }
   
-  CompareActions::CompareActions(std::vector<std::string> &v_)
-    : v(v_) {}
-
-  bool CompareActions::operator() (std::string const &lhs, std::string const &rhs)
-  {
-    plint i1 = getIndex(lhs);
-    plint i2 = getIndex(rhs);
-    
-    if(i1 == -1 || i2 == -1){
-      // do something...
-    }
-      
-    return (i1 > i2);
-  }
-
-  plint CompareActions::getIndex(std::string const &s)
-  {
-    plint ind = -1;
-
-    for(plint i=0;i<v.size();i++)
-      if(s.compare(v[i]) == 0){
-	ind=i;
-	break;
-      }
-
-    return ind;
-  }
 };
 
 
