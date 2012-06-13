@@ -28,6 +28,7 @@ int main(int argc, char **argv)
   for(int i=0;i<t.size();i++){
     //  std::cout << t[i] << " " << a[t[i]].get() << std::endl;
     std::cout << t[i] << " " 
+	      << a.find(t[i])->first << " "
 	      << a.find(t[i])->second.get() << std::endl;
     // need this workaround to access elements because
     // map::operator[] requires a default constructor....
