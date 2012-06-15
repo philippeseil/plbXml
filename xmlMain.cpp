@@ -25,22 +25,14 @@ int main(int argc, char **argv)
   PlbXmlController2D<T>::Timeline t(p.getTimeline());
   Action::ActionList a(p.getActionList());
   
-  for(int i=0;i<t.size();i++){
-    //  std::cout << t[i] << " " << a[t[i]].get() << std::endl;
-    std::cout << t[i] << " " 
-	      << a.find(t[i])->first << " "
-	      << a.find(t[i])->second.get() << std::endl;
-    // need this workaround to access elements because
-    // map::operator[] requires a default constructor....
-  }
   
+  Boundary::BoundaryList b(p.getBoundaryList());
 
-  for(Action::ActionListIterator it = a.begin(); it != a.end(); it++)
-    std::cout << (*it).first << " " << (*it).second.get()
-	      << " " << (*it).first.compare(t[0]) 
-	      << " " << (*it).first.compare("act1") << std::endl;
 
-  std::cout << (*(a.find(t[0]))).second.get() << std::endl;
+  for( Boundary::ConstBoundaryListIterator it = b.begin(); it != b.end(); ++it){
+    std::cout << it->first << " " 
+	      << (it->second.getRegion())->first << std::endl;
+  }
 
   return 0;
 }

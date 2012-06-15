@@ -1,5 +1,9 @@
 
-using namespace Region;
+/*
+ * ------------------------------------------------------------------
+ * getters for various lists
+ * ------------------------------------------------------------------
+ */
 
 template<typename T>
 const IncomprFlowParam<T>&  PlbXmlController2D<T>::getParams() const
@@ -24,6 +28,18 @@ const typename PlbXmlController2D<T>::Timeline& PlbXmlController2D<T>::getTimeli
 {
   return timeline;
 }
+
+template<typename T>
+const BoundaryList& PlbXmlController2D<T>::getBoundaryList() const
+{
+  return boundaryList;
+}
+
+/*
+ * --------------------------------------------------------------
+ * calculating and building functions for the various lists
+ * --------------------------------------------------------------
+ */
 
 template<typename T>
 IncomprFlowParam<T> PlbXmlController2D<T>::calcParams()
@@ -72,13 +88,32 @@ void PlbXmlController2D<T>::buildActionList()
 }
 
 template<typename T>
-void PlbXmlController2D<T>::buildTimeline()
+void PlbXmlController2D<T>::buildBoundaryList()
 {
-  plbCase["timeline"].read(timeline);
-  if(timeline.size() == 0){
-    // TODO: do something (error handling)
+  std::pair<BoundaryListIterator,bool> inserted;
+  XMLreaderProxy b(plbCase["boundary"]);
+  for( ; b.isValid(); b = b.iterId() ){
+    inserted = boundaryList.insert(boundaryFromXml(b,regionList));
+    if(!inserted.second)
+      std::cout << "Warning: Boundary with duplicate ID "
+		<< (inserted.first)->first << " ignored" << std::endl;
   }
 }
+template<typename T>
+void PlbXmlController2D<T>::buildTimeline()
+{
+  try{
+    plbCase["timeline"].read(timeline);
+  } catch (PlbIOException &e){
+    throw PlbIOException("Error: No timeline specified");
+  }
+}
+
+/*
+ * -----------------------------------------------------------------
+ * constructor and destructor
+ * -----------------------------------------------------------------
+ */
 
 template<typename T>
 PlbXmlController2D<T>::PlbXmlController2D(std::string &fname)
@@ -87,6 +122,7 @@ PlbXmlController2D<T>::PlbXmlController2D(std::string &fname)
 {
   buildRegionList();
   buildActionList();
+  buildBoundaryList();
   buildTimeline();
   // TODO check correctness of case ...
 }

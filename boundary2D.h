@@ -15,18 +15,24 @@ namespace Boundary{
   public:
     BoundaryClass2D(BoundaryType const t_,
 		    plb::boundary::BcType const &plbBcType_,
-		    Region::RegionListIterator const reg_)
+		    Region::ConstRegionListIterator const reg_)
       : type(t_), plbBcType(plbBcType_), reg(reg_) {}
+
+
+    const BoundaryType getBoundaryType() const { return type;}
+    const plb::boundary::BcType getPlbBcType() const { return plbBcType;}
+    const Region::ConstRegionListIterator& getRegion() const { return reg;}
 
   private:
     BoundaryType type;
     plb::boundary::BcType plbBcType;
-    Region::RegionListIterator reg;
+    Region::ConstRegionListIterator reg;
   };
 
   typedef std::pair<std::string,BoundaryClass2D> Boundary2D;
   typedef std::map<std::string,BoundaryClass2D> BoundaryList;
   typedef std::map<std::string,BoundaryClass2D>::iterator BoundaryListIterator;
+  typedef std::map<std::string,BoundaryClass2D>::const_iterator ConstBoundaryListIterator;
 
   Boundary2D boundaryFromXml(XMLreaderProxy const &b, Region::RegionList const &l)
   {
@@ -34,7 +40,7 @@ namespace Boundary{
     std::string regionId;
     BoundaryType bcType;
     plb::boundary::BcType plbBcType;
-    Region::RegionListIterator reg;
+    Region::ConstRegionListIterator reg;
 
     try{
       b["id"].read(id);
@@ -54,7 +60,7 @@ namespace Boundary{
     std::vector<std::string> bcTypeRead;
     try{
       b["type"].read(bcTypeRead);
-      if(bcTypeRead.size() == 0) throw PlbIOException("dummy");
+      if(bcTypeRead.size() == 0 || bcTypeRead.size() > 2) throw PlbIOException("dummy");
 
       if(bcTypeRead[0].compare("velocity") == 0)
 	bcType = VELOCITY;
@@ -62,9 +68,9 @@ namespace Boundary{
 	bcType = PRESSURE;
       else throw PlbIOException("dummy");
 
-      if(bcTypeRead.size() == 1 || bcTypeRead[1].compare("dirichlet"))
+      if(bcTypeRead.size() == 1 || bcTypeRead[1].compare("dirichlet") == 0)
 	plbBcType = boundary::dirichlet;
-      else if(bcType[1].compare("outflow") == 0 || bcType[1].compare("neumann") == 0)
+      else if(bcTypeRead[1].compare("outflow") == 0 || bcTypeRead[1].compare("neumann") == 0)
 	plbBcType = boundary::neumann;
       else if(bcType == VELOCITY) {
 	if(bcTypeRead[1].compare("freeslip") == 0)
