@@ -16,6 +16,7 @@ namespace Region{
   typedef std::pair<std::string,Box2D> Region2D;
   typedef std::map<std::string,Box2D> RegionList;
   typedef std::map<std::string,Box2D>::iterator RegionListIterator;
+  typedef std::map<std::string,Box2D>::const_iterator ConstRegionListIterator;
 
   Region2D regionFromXml(XMLreaderProxy const &r)
   {
