@@ -2,51 +2,38 @@
  * task object hierarchy
  */
 
+#ifndef TASK2D_H_LBDEM
+#define TASK2D_H_LBDEM
+
 #include "palabos2D.h"
 #include "palabos2D.hh"
 
 #include "globalDefs.h"
+#include "taskFactoryVariables2D.h"
+
+#include <list>
+
+using namespace plb;
 
 namespace Task{
-
+  enum TaskType;
+  
   class TaskBase{
   protected:
-    TaskBase() {}
+    TaskBase(TaskType const t_) : type(t_) {}
     virtual ~TaskBase() {}
+    TaskType type;
   public:
-    virtual void do(IncomprFlowParam<T> const &param, 
-		    MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-		    OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition) =0;
+    TaskType getType() { return type; }
+    virtual void perform(IncomprFlowParam<T> const &param, 
+			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition) =0;
   };
 
-  class ScheduledTask : TaskBase{
-  protected:
-    ScheduledTask() : TaskBase() {};
-    virtual ~TaskBase() {};
-
-  public:
-    virtual void do(IncomprFlowParam<T> const &param, 
-		    MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-		    OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition) =0;
-  };
-  class Run : public TaskBase{
-  public:
-    Run() : TaskBase();
-    virtual ~TaskBase() {}
-
-    virtual void do(IncomprFlowParam<T> const &param, 
-		    MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-		    OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition);
-  };
-
-
-  class ChangeBcValue : public TaskBase{
-  public:
-    ChangeBcValue() : TaskBase();
-    virtual ~ChangeBcValue();
-    virtual void do(IncomprFlowParam<T> const &param, 
-		    MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-		    OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition);
-  };
+  typedef std::list<TaskBase*> TaskList;
+  typedef std::list<TaskBase*>::iterator TaskListIterator;
+  typedef std::list<TaskBase*>::const_iterator TaskListConstIterator;
 
 };
+
+#endif /* TASK2D_H_LBDEM */
