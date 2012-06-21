@@ -4,20 +4,29 @@
 #include "palabos2D.h"
 #include "palabos2D.hh"
 
-#include "task2D.h"
-
+#include "globalDefs.h"
 
 namespace Task {
+  
+  class TaskBase{
+  protected:
+    TaskBase() {}
+    virtual ~TaskBase() {}
+  public:
+    virtual void perform(IncomprFlowParam<T> const &param, 
+			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition) =0;
+  };
 
   class SetDynamics : public TaskBase{
   public:
     virtual ~SetDynamics() {}
     virtual void perform(IncomprFlowParam<T> const &param, 
 			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition) {};
+			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition);
     friend TaskBase* setDynamicsFromXml(XMLreaderProxy const &r);
   private:
-    SetDynamics() : TaskBase(SET_DYNAMICS) {}
+    SetDynamics();
   };
 
   class ChangeBcValue : public TaskBase{
@@ -25,10 +34,10 @@ namespace Task {
     virtual ~ChangeBcValue() {}
     virtual void perform(IncomprFlowParam<T> const &param, 
 			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition) {};
+			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition);
     friend TaskBase* changeBcFromXml(XMLreaderProxy const &r);
   private:
-    ChangeBcValue() : TaskBase(CHANGE_BC) {}
+    ChangeBcValue();
   };
 
   class WriteVtk : public TaskBase{
@@ -36,12 +45,14 @@ namespace Task {
     virtual ~WriteVtk() {}
     virtual void perform(IncomprFlowParam<T> const &param, 
 			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition) {};
+			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition);
     friend TaskBase* writeVtkFromXml(XMLreaderProxy const &r);
   private:
-    WriteVtk() : TaskBase(WRITE_VTK) {}    
+    WriteVtk();
   };
 
 };
+
+#include "taskClasses2D.hh"
 
 #endif /* TASKCLASSES2D_H_LBDEM */

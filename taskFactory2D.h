@@ -6,47 +6,41 @@
 
 #include "taskClasses2D.h"
 #include "task2D.h"
-#include "taskFactoryVariables2D.h"
 
 using namespace plb;
 
 namespace Task {
+
+  class TaskBase;
 
   TaskBase* taskFromXml(XMLreaderProxy const &t);
   TaskBase* setDynamicsFromXml(XMLreaderProxy const &r);
   TaskBase* changeBcFromXml(XMLreaderProxy const &r);
   TaskBase* writeVtkFromXml(XMLreaderProxy const &r);
 
-  // insert new task types before NUM_OF_TASKS
-  
-  TaskBase* taskFromXml(XMLreaderProxy const &t)
-  {
-    std::string type = t.getName();
-    for(int i=0;i<(int)NUM_OF_TASKS;i++){
-      if(type.compare(taskText[i]) == 0)
-	return (*taskFactoryPtr[i])(t);
-    }
-    
-    throw PlbIOException("Unknown task type \"" + type + "\"");
+  /*
+   * taskText must have one more entry than taskFactoryPtr
+   * to check if no task text was found
+   */
+  const std::string LAST_TASK_TEXT_ENTRY("end");
+  const char *taskText[] = 
+    {
+      "setDynamics",
+      "changeBc",
+      "writeVtk",
+      LAST_TASK_TEXT_ENTRY.c_str()
+    };
 
-    return 0;
-  }
-
-  TaskBase* setDynamicsFromXml(XMLreaderProxy const &r)
+  TaskBase* (*taskFactoryPtr[])(XMLreaderProxy const &r) = 
   {
-    return new SetDynamics();
-  }
+    &setDynamicsFromXml,
+    &changeBcFromXml,
+    &writeVtkFromXml
+  };
 
-  TaskBase* changeBcFromXml(XMLreaderProxy const &r)
-  {
-    return new ChangeBcValue();
-  }
-
-  TaskBase* writeVtkFromXml(XMLreaderProxy const &r)
-  {
-    return new WriteVtk();
-  }
 
 };
+
+#include "taskFactory2D.hh"
 
 #endif /* TASKFACTORY2D_H_LBDEM */

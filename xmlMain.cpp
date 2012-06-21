@@ -35,7 +35,6 @@ int main(int argc, char **argv)
 	Task::TaskList const t = (it->second)->getTaskList();
 	for(Task::TaskListConstIterator it = t.begin();
 	    it != t.end(); ++it){
-	  std::cout << " action type: " << (*it)->getType() << " ";
 	}
 	std::cout << std::endl;
 
