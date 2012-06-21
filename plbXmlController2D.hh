@@ -123,7 +123,7 @@ PlbXmlController2D<T>::PlbXmlController2D(std::string &fname)
   buildRegionList();
   buildActionList();
   buildBoundaryList();
-  buildTimeline();
+  //  buildTimeline();
   // TODO check correctness of case ...
 }
 

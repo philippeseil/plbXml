@@ -7,11 +7,12 @@
 
 #include "plbXmlController2D.h"
 #include "region2D.h"
+#include "globalDefs.h"
+#include "task2D.h"
 
 #include <string>
 #include <iostream>
 
-typedef double T;
 
 int main(int argc, char **argv)
 {
@@ -23,15 +24,22 @@ int main(int argc, char **argv)
   PlbXmlController2D<T> p(fName);
 
   PlbXmlController2D<T>::Timeline t(p.getTimeline());
-  Action::ActionList a(p.getActionList());
-  
+  Action::ActionList const &a = p.getActionList();
   
   Boundary::BoundaryList b(p.getBoundaryList());
 
+  for(int i=0;i<100;i++){
+    for(ActionListIterator it=a.begin(); it != a.end(); ++it){
+      if((it->second)->performAtStep(i)){
+	std::cout << "step " << i << " action " << (it->first);
+	Task::TaskList const t = (it->second)->getTaskList();
+	for(Task::TaskListConstIterator it = t.begin();
+	    it != t.end(); ++it){
+	}
+	std::cout << std::endl;
 
-  for( Boundary::ConstBoundaryListIterator it = b.begin(); it != b.end(); ++it){
-    std::cout << it->first << " " 
-	      << (it->second.getRegion())->first << std::endl;
+      }
+    }
   }
 
   return 0;
