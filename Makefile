@@ -17,7 +17,8 @@
 # Leading directory of the Palabos source code
 palabosRoot   = ${PALABOS_ROOT}
 # Name of source files in current directory to compile and link with Palabos
-projectFiles = xmlMain.cpp
+projectFiles = xmlMain.cpp boundary2D.cpp taskFactory2D.cpp action2D.cpp \
+	taskClasses2D.cpp plbXmlController2D.cpp region2D.cpp
 
 # Set optimization flags on/off
 optimize     = false
@@ -46,13 +47,13 @@ serialCXX    = g++
 # Compiler to use with MPI parallelism
 parallelCXX  = mpicxx
 # General compiler flags (e.g. -Wall to turn on all warnings on g++)
-compileFlags = -Wall -Wnon-virtual-dtor
+compileFlags =  -Wnon-virtual-dtor
 # General linker flags (don't put library includes into this flag)
 linkFlags    =
 # Compiler flags to use when optimization mode is on
 optimFlags   = -O3
 # Compiler flags to use when debug mode is on
-debugFlags   = -g
+debugFlags   = -g 
 # Compiler flags to use when profile mode is on
 profileFlags = -pg
 

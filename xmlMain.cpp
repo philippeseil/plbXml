@@ -2,8 +2,7 @@
  * main file to test functions of plbXmlController2D
  */
 
-#include "palabos2D.h"
-#include "palabos2D.hh"
+#include "plbHeaders2D.h"
 
 #include "plbXmlController2D.h"
 #include "region2D.h"
@@ -21,9 +20,9 @@ int main(int argc, char **argv)
   std::string fName;
   global::argv(1).readNoThrow(fName);
 
-  PlbXmlController2D<T> p(fName);
+  PlbXmlController2D p(fName);
 
-  PlbXmlController2D<T>::Timeline t(p.getTimeline());
+  PlbXmlController2D::Timeline t(p.getTimeline());
   Action::ActionList const &a = p.getActionList();
   
   Boundary::BoundaryList b(p.getBoundaryList());

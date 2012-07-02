@@ -5,9 +5,6 @@
 #ifndef TASK2D_H_LBDEM
 #define TASK2D_H_LBDEM
 
-#include "palabos2D.h"
-#include "palabos2D.hh"
-
 #include <list>
 
 #include "taskClasses2D.h"

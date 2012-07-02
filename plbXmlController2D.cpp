@@ -1,36 +1,33 @@
 
+#include "plbXmlController2D.h"
+
 /*
  * ------------------------------------------------------------------
  * getters for various lists
  * ------------------------------------------------------------------
  */
 
-template<typename T>
-const IncomprFlowParam<T>&  PlbXmlController2D<T>::getParams() const
+const IncomprFlowParam<T>&  PlbXmlController2D::getParams() const
 {
   return params;
 }
 
-template<typename T>
-const RegionList& PlbXmlController2D<T>::getRegionList() const
+const RegionList& PlbXmlController2D::getRegionList() const
 {
   return regionList;
 }
 
-template<typename T>
-const ActionList& PlbXmlController2D<T>::getActionList() const
+const ActionList& PlbXmlController2D::getActionList() const
 {
   return actionList;
 }
 
-template<typename T>
-const typename PlbXmlController2D<T>::Timeline& PlbXmlController2D<T>::getTimeline() const
+const PlbXmlController2D::Timeline& PlbXmlController2D::getTimeline() const
 {
   return timeline;
 }
 
-template<typename T>
-const BoundaryList& PlbXmlController2D<T>::getBoundaryList() const
+const BoundaryList& PlbXmlController2D::getBoundaryList() const
 {
   return boundaryList;
 }
@@ -41,8 +38,7 @@ const BoundaryList& PlbXmlController2D<T>::getBoundaryList() const
  * --------------------------------------------------------------
  */
 
-template<typename T>
-IncomprFlowParam<T> PlbXmlController2D<T>::calcParams()
+IncomprFlowParam<T> PlbXmlController2D::calcParams()
 {
   XMLreaderProxy p(plbCase["parameters"]);
   
@@ -58,8 +54,7 @@ IncomprFlowParam<T> PlbXmlController2D<T>::calcParams()
   return IncomprFlowParam<T>(physU,latticeU,Re,physLength,res,lx,ly);
 }
 
-template<typename T>
-void PlbXmlController2D<T>::buildRegionList()
+void PlbXmlController2D::buildRegionList()
 {
   std::pair<RegionListIterator,bool> inserted;
   XMLreaderProxy reg(plbCase["region"]);
@@ -72,8 +67,7 @@ void PlbXmlController2D<T>::buildRegionList()
   }
 }
 
-template<typename T>
-void PlbXmlController2D<T>::buildActionList()
+void PlbXmlController2D::buildActionList()
 {
   std::pair<ActionListIterator,bool> inserted;
   XMLreaderProxy act(plbCase["action"]);
@@ -87,20 +81,18 @@ void PlbXmlController2D<T>::buildActionList()
 
 }
 
-template<typename T>
-void PlbXmlController2D<T>::buildBoundaryList()
+void PlbXmlController2D::buildBoundaryList()
 {
   std::pair<BoundaryListIterator,bool> inserted;
   XMLreaderProxy b(plbCase["boundary"]);
   for( ; b.isValid(); b = b.iterId() ){
-    inserted = boundaryList.insert(boundaryFromXml(b,regionList));
+    inserted = boundaryList.insert(boundaryFromXml(this,b));
     if(!inserted.second)
       std::cout << "Warning: Boundary with duplicate ID "
 		<< (inserted.first)->first << " ignored" << std::endl;
   }
 }
-template<typename T>
-void PlbXmlController2D<T>::buildTimeline()
+void PlbXmlController2D::buildTimeline()
 {
   try{
     plbCase["timeline"].read(timeline);
@@ -115,20 +107,18 @@ void PlbXmlController2D<T>::buildTimeline()
  * -----------------------------------------------------------------
  */
 
-template<typename T>
-PlbXmlController2D<T>::PlbXmlController2D(std::string &fname)
+PlbXmlController2D::PlbXmlController2D(std::string &fname)
   : reader(fname), plbCase(reader["plbCase"]),
     params(this->calcParams())
 {
   buildRegionList();
-  buildActionList();
+  //  buildActionList();
   buildBoundaryList();
   //  buildTimeline();
   // TODO check correctness of case ...
 }
 
-template<typename T>
-PlbXmlController2D<T>::~PlbXmlController2D()
+PlbXmlController2D::~PlbXmlController2D()
 {
 
 }

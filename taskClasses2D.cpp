@@ -1,3 +1,5 @@
+#include "taskClasses2D.h"
+#include "plbHeaders2D.h"
 
 namespace Task{
   /*
@@ -6,14 +8,21 @@ namespace Task{
    * ------------------------------------------------------------
    */
   
-  SetDynamics::SetDynamics() 
-    : TaskBase()
+  SetDynamics::SetDynamics(std::string regionId_, plb::Dynamics<T,DESCRIPTOR> *dyn_) 
+    : TaskBase(), regionId(regionId_), dyn(dyn_)
   {
+    
+  }
 
+  SetDynamics::~SetDynamics()
+  {
+    delete dyn;
   }
   void SetDynamics::perform(IncomprFlowParam<T> const &param, 
 			    MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			    OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition)
+			    OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
+			    Boundary::BoundaryList const &b,
+			    Region::RegionList const &r)
   {
     
   };
@@ -25,14 +34,21 @@ namespace Task{
    */
  
   ChangeBcValue::ChangeBcValue()
-    : TaskBase()
+    : TaskBase(), i(1)
+  {
+
+  }
+
+  ChangeBcValue::~ChangeBcValue()
   {
 
   }
 
   void ChangeBcValue::perform(IncomprFlowParam<T> const &param, 
 			      MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition)
+			      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
+			      Boundary::BoundaryList const &b,
+			      Region::RegionList const &r)
   {
     
   };
@@ -43,16 +59,23 @@ namespace Task{
    */
  
   WriteVtk::WriteVtk()
-    : TaskBase()
+    : TaskBase(), i(1)
+  {
+
+  }
+
+  WriteVtk::~WriteVtk()
   {
 
   }
 
   void WriteVtk::perform(IncomprFlowParam<T> const &param, 
 			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition)
+			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
+			 Boundary::BoundaryList const &b,
+			 Region::RegionList const &r)
   {
-    
+    i++;
   };
 
 
