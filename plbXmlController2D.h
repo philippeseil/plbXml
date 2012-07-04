@@ -6,9 +6,6 @@
 #ifndef PBLXMLCONTROLLER_2D_LBDEM
 #define PBLXMLCONTROLLER_2D_LBDEM
 
-//#include "palabos2D.h"
-//#include "palabos2D.hh"
-
 #include "action2D.h"
 #include "region2D.h"
 #include "boundary2D.h"
@@ -20,6 +17,14 @@
 #include <utility>
 #include <vector>
 
+namespace plb{
+  template<typename U> class IncomprFlowParam;
+  template<typename U, template<typename V> class Desc > class OnLatticeBoundaryCondition2D;
+  template<typename U, template<typename V> class Desc > class MultiBlockLattice2D;
+  class XMLreader;
+  class XMLreaderProxy;
+};
+
 using namespace plb;
 using namespace Action;
 using namespace Region;
@@ -30,14 +35,12 @@ public:
   PlbXmlController2D(std::string &fname);
   ~PlbXmlController2D();
 
-  typedef std::vector<std::string> Timeline;
-
-  const class IncomprFlowParam<T>& getParams() const;
+  const IncomprFlowParam<T>& getParams() const;
   const RegionList& getRegionList() const;
   const ActionList& getActionList() const;
-  const Timeline& getTimeline() const;
   const BoundaryList& getBoundaryList() const;
 
+  void run(plint nSteps);
 private:
   IncomprFlowParam<T> calcParams();
   void buildRegionList();
@@ -45,15 +48,23 @@ private:
   void buildTimeline();
   void buildBoundaryList();
 
+  void initializeLattice();
+  OnLatticeBoundaryCondition2D<T,DESCRIPTOR>* createBoundaryCondition();
+
+  void performActions(plint step);
+
   // here, order is highly important because of initialization!
-  class XMLreader reader;
-  class XMLreaderProxy plbCase;
-  class IncomprFlowParam<T> params;
+  XMLreader reader;
+  XMLreaderProxy plbCase;
+  IncomprFlowParam<T> params;
+  OnLatticeBoundaryCondition2D<T,DESCRIPTOR> *boundaryCondition;
 
   RegionList regionList;
   ActionList actionList;
   BoundaryList boundaryList;
-  Timeline timeline;
+  
+  MultiBlockLattice2D<T,DESCRIPTOR> lattice;
+  
 };
 
 #endif /* PBLXMLCONTROLLER_2D_LBDEM */

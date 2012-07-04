@@ -7,9 +7,16 @@ namespace plb{
 };
 
 namespace Boundary {
+  BoundaryClass2D::BoundaryClass2D(PlbXmlController2D const *controller_,
+				   BoundaryType const t_,
+				   plb::boundary::BcType const &plbBcType_,
+				   Region::ConstRegionListIterator const reg_)
+    : controller(controller_), type(t_), plbBcType(plbBcType_), reg(reg_->second) {}
+
+  plb::Box2D BoundaryClass2D::getRegion() const { return reg;}
 
   Boundary2D boundaryFromXml(PlbXmlController2D const *controller, XMLreaderProxy const &b)
-    {
+  {
     std::string id;
     std::string regionId;
     BoundaryType bcType;

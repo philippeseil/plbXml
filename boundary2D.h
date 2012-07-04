@@ -8,6 +8,7 @@
 
 #include "region2D.h"
 #include "boundaryCondition/boundaryCondition.h"
+#include "core/geometry2D.h"
 
 class PlbXmlController2D;
 
@@ -23,19 +24,17 @@ namespace Boundary{
     BoundaryClass2D(PlbXmlController2D const *controller_,
 		    BoundaryType const t_,
 		    plb::boundary::BcType const &plbBcType_,
-		    Region::ConstRegionListIterator const reg_)
-      : controller(controller_), type(t_), plbBcType(plbBcType_), reg(reg_) {}
-
+		    Region::ConstRegionListIterator const reg_);
 
     const BoundaryType getBoundaryType() const { return type;}
     const plb::boundary::BcType getPlbBcType() const { return plbBcType;}
-    const Region::ConstRegionListIterator& getRegion() const { return reg;}
+    plb::Box2D getRegion() const;
 
   private:
     BoundaryType type;
     plb::boundary::BcType plbBcType;
-    Region::ConstRegionListIterator reg;
-    PlbXmlController2D const * controller;
+    plb::Box2D reg;
+    PlbXmlController2D const *controller;
   };
 
   typedef std::pair<std::string,BoundaryClass2D> Boundary2D;

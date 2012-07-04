@@ -7,62 +7,64 @@
 #include "boundary2D.h"
 #include "region2D.h"
 
+class PlbXmlController2D;
+
 namespace Task {
   
   class TaskBase{
   protected:
-    TaskBase() {}
+  TaskBase(PlbXmlController2D const *controller_) : controller(controller_) {}
     virtual ~TaskBase() {}
+    PlbXmlController2D const *controller;
   public:
-    virtual void perform(IncomprFlowParam<T> const &param, 
-			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+    virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
 			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			 Boundary::BoundaryList const &b,
-			 Region::RegionList const &r) =0;
+			 plint nStep) =0;
   };
 
   class SetDynamics : public TaskBase{
   public:
     virtual ~SetDynamics();
-    virtual void perform(IncomprFlowParam<T> const &param, 
-			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+    virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
 			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			 Boundary::BoundaryList const &b,
-			 Region::RegionList const &r);
-    friend TaskBase* setDynamicsFromXml(XMLreaderProxy const &r, IncomprFlowParam<T> const &param);
+			 plint nStep);
+    friend TaskBase* setDynamicsFromXml(PlbXmlController2D const *controller, 
+					XMLreaderProxy const &r);
   private:
-    SetDynamics(std::string regionId_, plb::Dynamics<T,DESCRIPTOR> *dyn_);
+    SetDynamics(PlbXmlController2D const *controller, 
+		std::string regionId_, plb::Dynamics<T,DESCRIPTOR> *dyn_);
     std::string regionId;
     plb::Dynamics<T,DESCRIPTOR> *dyn;
-  };
-
-  class ChangeBcValue : public TaskBase {
-  public:
-    virtual ~ChangeBcValue();
-    virtual void perform(IncomprFlowParam<T> const &param, 
-			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			 Boundary::BoundaryList const &b,
-			 Region::RegionList const &r);
-    friend TaskBase* changeBcFromXml(XMLreaderProxy const &r, IncomprFlowParam<T> const &param);
-  private:
-    ChangeBcValue();
-    int i;
   };
 
   class WriteVtk : public TaskBase {
   public:
     virtual ~WriteVtk();
-    virtual void perform(IncomprFlowParam<T> const &param, 
-			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+    virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
 			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			 Boundary::BoundaryList const &b,
-			 Region::RegionList const &r);
-    friend TaskBase* writeVtkFromXml(XMLreaderProxy const &r, IncomprFlowParam<T> const &param);
+			 plint nStep);
+    friend TaskBase* writeVtkFromXml(PlbXmlController2D const *controller, 
+				     XMLreaderProxy const &r);
   private:
-    WriteVtk();
-    int i;
+    WriteVtk(PlbXmlController2D const *controller, std::string const &prefix_);
+    std::string prefix;
   };
+
+  class SetPressureBc : public TaskBase {
+  public:
+    virtual ~SetPressureBc();
+    virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
+			 plint nStep);
+    friend TaskBase* setPressureBcFromXml(PlbXmlController2D const *controller, 
+				     XMLreaderProxy const &r);
+  private:
+    SetPressureBc(PlbXmlController2D const *controller, Box2D const &reg_, T val);
+    Box2D reg;
+    T val;
+  };
+
+
 };
 
 

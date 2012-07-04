@@ -1,5 +1,6 @@
 #include "taskClasses2D.h"
 #include "plbHeaders2D.h"
+#include "plbXmlController2D.h"
 
 namespace Task{
   /*
@@ -8,8 +9,9 @@ namespace Task{
    * ------------------------------------------------------------
    */
   
-  SetDynamics::SetDynamics(std::string regionId_, plb::Dynamics<T,DESCRIPTOR> *dyn_) 
-    : TaskBase(), regionId(regionId_), dyn(dyn_)
+  SetDynamics::SetDynamics(PlbXmlController2D const *controller_, 
+			   std::string regionId_, plb::Dynamics<T,DESCRIPTOR> *dyn_) 
+    : TaskBase(controller_), regionId(regionId_), dyn(dyn_)
   {
     
   }
@@ -18,13 +20,13 @@ namespace Task{
   {
     delete dyn;
   }
-  void SetDynamics::perform(IncomprFlowParam<T> const &param, 
-			    MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+  void SetDynamics::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
 			    OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			    Boundary::BoundaryList const &b,
-			    Region::RegionList const &r)
+			    plint nStep)
   {
-    
+    Box2D reg( (controller->getRegionList()).find(regionId)->second );
+    defineDynamics(lattice, reg, dyn->clone());
+    std::cout << "Defined dynamics" << std::endl;
   };
   
   /*
@@ -33,24 +35,24 @@ namespace Task{
    * ------------------------------------------------------------
    */
  
-  ChangeBcValue::ChangeBcValue()
-    : TaskBase(), i(1)
-  {
-
-  }
-
-  ChangeBcValue::~ChangeBcValue()
-  {
-
-  }
-
-  void ChangeBcValue::perform(IncomprFlowParam<T> const &param, 
-			      MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			      Boundary::BoundaryList const &b,
-			      Region::RegionList const &r)
+  SetPressureBc::SetPressureBc(PlbXmlController2D const *controller, Box2D const &reg_, T val_)
+    : TaskBase(controller), reg(reg_), val(val_)
   {
     
+  }
+
+  SetPressureBc::~SetPressureBc()
+  {
+
+  }
+
+  void SetPressureBc::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+			      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
+			      plint nStep)
+  {
+    std::cout << "boundary density set to " << val << std::endl;
+    setBoundaryDensity(lattice, reg, val );
+    initializeAtEquilibrium(lattice,reg,val,Array<T,2>(0.,0.));
   };
   /*
    * ------------------------------------------------------------
@@ -58,8 +60,8 @@ namespace Task{
    * ------------------------------------------------------------
    */
  
-  WriteVtk::WriteVtk()
-    : TaskBase(), i(1)
+  WriteVtk::WriteVtk(PlbXmlController2D const *controller, std::string const &prefix_)
+    : TaskBase(controller), prefix(prefix_)
   {
 
   }
@@ -69,13 +71,18 @@ namespace Task{
 
   }
 
-  void WriteVtk::perform(IncomprFlowParam<T> const &param, 
-			 MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+  void WriteVtk::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
 			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			 Boundary::BoundaryList const &b,
-			 Region::RegionList const &r)
+			 plint nStep)
   {
-    i++;
+    T dx = controller->getParams().getDeltaX();
+    T dt = controller->getParams().getDeltaT();
+    std::string fname = createFileName(prefix, nStep, 8);
+    VtkImageOutput2D<T> vtkOut(fname, dx);
+    vtkOut.writeData<float>(*computeVelocityNorm(lattice), "velocityNorm", dx/dt);
+    vtkOut.writeData<float>(*computeDensity(lattice), "density", 1);
+    vtkOut.writeData<2,float>(*computeVelocity(lattice), "velocity", dx/dt);
+    pcout << "vtk file " << fname << " written" << std::endl;
   };
 
 
