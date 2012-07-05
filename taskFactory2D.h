@@ -17,6 +17,8 @@ namespace Task {
 			    XMLreaderProxy const &r);
   TaskBase* setPressureBcFromXml(PlbXmlController2D const *controller,
 				 XMLreaderProxy const &r);
+  TaskBase* setVelocityBcFromXml(PlbXmlController2D const *controller,
+				 XMLreaderProxy const &r);
 
   /*
    * taskText must have one more entry than taskFactoryPtr

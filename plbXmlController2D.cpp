@@ -1,6 +1,6 @@
 
 #include "plbXmlController2D.h"
-
+#include "ioUtils.h"
 /*
  * ------------------------------------------------------------------
  * getters for various lists
@@ -25,6 +25,11 @@ const ActionList& PlbXmlController2D::getActionList() const
 const BoundaryList& PlbXmlController2D::getBoundaryList() const
 {
   return boundaryList;
+}
+
+plint PlbXmlController2D::getNumSteps() const
+{ 
+  return nSteps;
 }
 
 /*
@@ -88,6 +93,33 @@ void PlbXmlController2D::buildBoundaryList()
   }
 }
 
+Dynamics<T,DESCRIPTOR>* PlbXmlController2D::dynamicsFromXML(XMLreaderProxy dyn)
+{
+  std::vector<std::string> type;
+  dyn.read(type);
+  if(type[0].compare("BGKdynamics") == 0)
+    return new BGKdynamics<T,DESCRIPTOR>(params.getOmega());
+  if(type[0].compare("RegularizedBGK") == 0)
+    return new RegularizedBGKdynamics<T,DESCRIPTOR>(params.getOmega());
+  if(type[0].compare("SmagorinskyRegularized") == 0){
+    if(type.size()<2)
+      throw PlbIOException("Missing Smagorinsky constant");
+    T cs = atof(type[1].c_str());
+    return new SmagorinskyRegularizedDynamics<T,DESCRIPTOR>(params.getOmega(),cs);
+  }
+  if(type[0].compare("SmagorinskyBGK") == 0){
+    throw PlbIOException("Missing Smagorinsky constant");
+    T cs = atof(type[1].c_str());
+    return new SmagorinskyBGKdynamics<T,DESCRIPTOR>(params.getOmega(),cs);
+  }
+  if(type[0].compare("BounceBack") == 0)
+    return new BounceBack<T,DESCRIPTOR>();
+  if(type[0].compare("NoDynamics") == 0)
+    return new NoDynamics<T,DESCRIPTOR>();
+  
+  return 0;
+}
+
 OnLatticeBoundaryCondition2D<T,DESCRIPTOR>* PlbXmlController2D::createBoundaryCondition()
 {
   std::string type;
@@ -122,8 +154,33 @@ OnLatticeBoundaryCondition2D<T,DESCRIPTOR>* PlbXmlController2D::createBoundaryCo
 
 void PlbXmlController2D::initializeLattice()
 {
-
-  performActions(0);
+  bool dummy, flag(true);
+  if(ioUtils::elementExists(plbCase,"dynamicsFromRegion")){
+    XMLreaderProxy dyn = plbCase["dynamicsFromRegion"];
+    for (; dyn.isValid(); dyn = dyn.iterId()) {
+      std::string regionId;
+      dyn["regionId"].read(regionId);
+      Box2D reg = (regionList.find(regionId))->second;
+      defineDynamics(lattice,reg,
+		     dynamicsFromXML(dyn["type"]));
+    }
+  }
+  if(ioUtils::elementExists(plbCase,"dynamicsFromFile")){
+    XMLreaderProxy dyn = plbCase["dynamicsFromFile"];
+    for (; dyn.isValid(); dyn = dyn.iterId()) {
+      std::string fname;
+      plint maskVal;
+      dyn["fileName"].read(fname);
+      dyn["maskVal"].read(maskVal);
+      MultiScalarField2D<int> intMask(params.getNx(), params.getNy());
+      
+      plb_ifstream ifile(fname.c_str());
+      ifile >> intMask;
+      
+      defineDynamics(lattice, intMask, dynamicsFromXML(dyn["type"]), maskVal);
+    }
+  }
+  
 
   // iterate over boundary list to create boundary blocks
   BoundaryListIterator b;
@@ -139,7 +196,7 @@ void PlbXmlController2D::initializeLattice()
       boundaryCondition->setPressureConditionOnBlockBoundaries(lattice,reg,bc.getPlbBcType());
     }
   }
-  initializeAtEquilibrium(lattice,lattice.getBoundingBox(),1.,Array<T,2>(params.getLatticeU(),1.));
+  initializeAtEquilibrium(lattice,lattice.getBoundingBox(),1.,Array<T,2>(0.,0.));
 
   lattice.initialize();
 }
@@ -150,18 +207,23 @@ void PlbXmlController2D::initializeLattice()
  * -----------------------------------------------------------------
  */
 
-void PlbXmlController2D::run(plint nSteps)
+void PlbXmlController2D::doStep()
 {
-  /*
   static bool init = true;
   if(init){
     performActions(0);
+    iStep = 1;
     init=false;
   }
-  */
-  for(plint i=1;i<=nSteps;i++){
-    lattice.collideAndStream();
-    performActions(i);
+
+  lattice.collideAndStream();
+  performActions(iStep++);
+}
+
+void PlbXmlController2D::run(plint nSteps_)
+{
+  for(plint i=1;i<=nSteps_;i++){
+    doStep();
   }
 }
 
@@ -189,13 +251,19 @@ PlbXmlController2D::PlbXmlController2D(std::string &fname)
   : reader(fname), plbCase(reader["plbCase"]),
     params(calcParams()), 
     lattice(params.getNx(),params.getNy(),new NoDynamics<T,DESCRIPTOR>()),
-    boundaryCondition(createBoundaryCondition())
+    boundaryCondition(createBoundaryCondition()),
+    nSteps(0), iStep(0)
 {
   buildRegionList();
   buildBoundaryList();
   buildActionList();
 
   initializeLattice();
+  plbCase["run"].read(nSteps);
+
+  pcout << "Lattice size: " << params.getNx() << " " << params.getNy() << std::endl;
+  pcout << "Lattice U   : " << params.getLatticeU()<< std::endl;
+  pcout << "omega       : " << params.getOmega() << std::endl;
 }
 
 PlbXmlController2D::~PlbXmlController2D()

@@ -31,7 +31,7 @@ namespace Task{
   
   /*
    * ------------------------------------------------------------
-   * class ChangeBcValue
+   * class SetPressureBC
    * ------------------------------------------------------------
    */
  
@@ -50,10 +50,39 @@ namespace Task{
 			      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 			      plint nStep)
   {
-    std::cout << "boundary density set to " << val << std::endl;
+    pcout << "boundary density set to " << val << std::endl;
     setBoundaryDensity(lattice, reg, val );
     initializeAtEquilibrium(lattice,reg,val,Array<T,2>(0.,0.));
   };
+
+
+  /*
+   * ------------------------------------------------------------
+   * class SetVelocityBC
+   * ------------------------------------------------------------
+   */
+ 
+  SetVelocityBc::SetVelocityBc(PlbXmlController2D const *controller, Box2D const &reg_, Array<T,2> const &val_)
+    : TaskBase(controller), reg(reg_), val(val_)
+  {
+    
+  }
+
+  SetVelocityBc::~SetVelocityBc()
+  {
+
+  }
+
+  void SetVelocityBc::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+			      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
+			      plint nStep)
+  {
+    pcout << "boundary velocity set to " << val[0] << " " << val[1] << std::endl;
+    setBoundaryVelocity(lattice, reg, val );
+    initializeAtEquilibrium(lattice,reg,1.,val);
+  };
+
+
   /*
    * ------------------------------------------------------------
    * class WriteVtk

@@ -18,12 +18,12 @@
 palabosRoot   = ${PALABOS_ROOT}
 # Name of source files in current directory to compile and link with Palabos
 projectFiles = xmlMain.cpp boundary2D.cpp taskFactory2D.cpp action2D.cpp \
-	taskClasses2D.cpp plbXmlController2D.cpp region2D.cpp
+	taskClasses2D.cpp plbXmlController2D.cpp region2D.cpp ioUtils.cpp
 
 # Set optimization flags on/off
-optimize     = false
+optimize     = true
 # Set debug mode and debug flags on/off
-debug        = true
+debug        = false
 # Set profiling flags on/off
 profile      = false
 # Set MPI-parallel mode on/off (parallelism in cluster-like environment)

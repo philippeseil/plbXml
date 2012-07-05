@@ -21,6 +21,7 @@ namespace plb{
   template<typename U> class IncomprFlowParam;
   template<typename U, template<typename V> class Desc > class OnLatticeBoundaryCondition2D;
   template<typename U, template<typename V> class Desc > class MultiBlockLattice2D;
+  template<typename U, template<typename V> class Desc > class OnLatticeBoundaryCondition2D;
   class XMLreader;
   class XMLreaderProxy;
 };
@@ -41,6 +42,8 @@ public:
   const BoundaryList& getBoundaryList() const;
 
   void run(plint nSteps);
+  void doStep();
+  plint getNumSteps() const;
 private:
   IncomprFlowParam<T> calcParams();
   void buildRegionList();
@@ -50,6 +53,7 @@ private:
 
   void initializeLattice();
   OnLatticeBoundaryCondition2D<T,DESCRIPTOR>* createBoundaryCondition();
+  Dynamics<T,DESCRIPTOR>* dynamicsFromXML(XMLreaderProxy dyn);
 
   void performActions(plint step);
 
@@ -63,6 +67,7 @@ private:
   ActionList actionList;
   BoundaryList boundaryList;
   
+  int nSteps, iStep;
   MultiBlockLattice2D<T,DESCRIPTOR> lattice;
   
 };

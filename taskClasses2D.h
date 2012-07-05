@@ -64,6 +64,20 @@ namespace Task {
     T val;
   };
 
+  class SetVelocityBc : public TaskBase {
+  public:
+    virtual ~SetVelocityBc();
+    virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
+			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
+			 plint nStep);
+    friend TaskBase* setVelocityBcFromXml(PlbXmlController2D const *controller, 
+				     XMLreaderProxy const &r);
+  private:
+    SetVelocityBc(PlbXmlController2D const *controller, Box2D const &reg_, Array<T,2> const &val);
+    Box2D reg;
+    Array<T,2> val;
+  };
+
 
 };
 

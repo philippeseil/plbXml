@@ -14,6 +14,7 @@ namespace Task{
       "setDynamics",
       "writeVtk",
       "setPressureBc",
+      "setVelocityBc",
       LAST_TASK_TEXT_ENTRY.c_str()
     };
 
@@ -22,7 +23,8 @@ namespace Task{
   {
     &setDynamicsFromXml,
     &writeVtkFromXml,
-    &setPressureBcFromXml
+    &setPressureBcFromXml,
+    &setVelocityBcFromXml
   };
 
   TaskBase* taskFromXml(PlbXmlController2D const *controller,
@@ -98,6 +100,20 @@ namespace Task{
   TaskBase *setVelocityBcFromXml(PlbXmlController2D const *controller,
 				 XMLreaderProxy const &r)
   {
-    return 0;
+    std::string bcId;
+    std::vector<T> val;
+    try{
+      r["bcId"].read(bcId);
+      r["bcValue"].read(val);
+    } catch(PlbIOException &e) {
+      plbIOError("Invalid Set Velocity BC command");
+    }
+    ConstBoundaryListIterator b = (controller->getBoundaryList()).find(bcId);
+    if(b == (controller->getBoundaryList()).end())
+      plbIOError("Invalid boundary ID " + bcId);
+
+    Box2D reg = (b->second).getRegion();
+    return new SetVelocityBc(controller,reg,Array<T,2>(val[0],val[1]));
+
   }
 };
