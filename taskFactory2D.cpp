@@ -1,5 +1,6 @@
 #include "taskFactory2D.h"
 #include "taskClasses2D.h"
+#include "ioUtils.h"
 
 #include "plbXmlController2D.h"
 #include "plbHeaders2D.h"
@@ -82,29 +83,36 @@ namespace Task{
 				 XMLreaderProxy const &r)
   { 
     std::string bcId;
-    T val;
     try{
       r["bcId"].read(bcId);
-      r["bcValue"].read(val);
     } catch(PlbIOException &e) {
       plbIOError("Invalid Set Pressure BC command");
     }
     ConstBoundaryListIterator b = (controller->getBoundaryList()).find(bcId);
     if(b == (controller->getBoundaryList()).end())
       plbIOError("Invalid boundary ID " + bcId);
-
+    
     Box2D reg = (b->second).getRegion();
-    return new SetPressureBc(controller,reg,val);
+    if(ioUtils::elementExists(r,"bcValue")){
+      T val;
+      r["bcValue"].read(val);
+      return new SetPressureBc(controller,reg,val);
+    } else if(ioUtils::elementExists(r,"valFile")){
+      std::string fname;
+      r["valFile"].read(fname);
+      return new SetPressureBcFromFile(controller,reg,fname);
+    }
+
+    plbIOError("Invalid Set Pressure BC command");
+    return 0;
   }
 
   TaskBase *setVelocityBcFromXml(PlbXmlController2D const *controller,
 				 XMLreaderProxy const &r)
   {
     std::string bcId;
-    std::vector<T> val;
     try{
       r["bcId"].read(bcId);
-      r["bcValue"].read(val);
     } catch(PlbIOException &e) {
       plbIOError("Invalid Set Velocity BC command");
     }
@@ -113,7 +121,19 @@ namespace Task{
       plbIOError("Invalid boundary ID " + bcId);
 
     Box2D reg = (b->second).getRegion();
-    return new SetVelocityBc(controller,reg,Array<T,2>(val[0],val[1]));
+    if(ioUtils::elementExists(r,"bcValue")){
+      std::vector<T> val;
+      r["bcValue"].read(val);
+      return new SetVelocityBc(controller,reg,Array<T,2>(val[0],val[1]));
+    } else if(ioUtils::elementExists(r,"valFile")){
+      std::string fname;
+      r["valFile"].read(fname);
+      return new SetVelocityBcFromFile(controller,reg,fname);
+    }
+
+    plbIOError("Invalit Set Velocity BC command");
+
+    return 0;
 
   }
 };

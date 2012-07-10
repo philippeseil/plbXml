@@ -10,6 +10,7 @@
 #include "region2D.h"
 #include "boundary2D.h"
 #include "globalDefs.h"
+#include "units.h"
 
 #include <string>
 #include <list>
@@ -26,6 +27,8 @@ namespace plb{
   class XMLreaderProxy;
 };
 
+template<typename U> class LBconverter;
+
 using namespace plb;
 using namespace Action;
 using namespace Region;
@@ -37,6 +40,7 @@ public:
   ~PlbXmlController2D();
 
   const IncomprFlowParam<T>& getParams() const;
+  const LBconverter<T>& getUnits() const;
   const RegionList& getRegionList() const;
   const ActionList& getActionList() const;
   const BoundaryList& getBoundaryList() const;
@@ -46,12 +50,16 @@ public:
   plint getNumSteps() const;
 private:
   IncomprFlowParam<T> calcParams();
+  LBconverter<T> calcUnits();
   void buildRegionList();
   void buildActionList();
   void buildTimeline();
   void buildBoundaryList();
 
   void initializeLattice();
+  void setDynamics();
+  void setBoundaries();
+  void setInitValsFromFile();
   OnLatticeBoundaryCondition2D<T,DESCRIPTOR>* createBoundaryCondition();
   Dynamics<T,DESCRIPTOR>* dynamicsFromXML(XMLreaderProxy dyn);
 
@@ -60,6 +68,7 @@ private:
   // here, order is highly important because of initialization!
   XMLreader reader;
   XMLreaderProxy plbCase;
+  LBconverter<T> units;
   IncomprFlowParam<T> params;
   OnLatticeBoundaryCondition2D<T,DESCRIPTOR> *boundaryCondition;
 

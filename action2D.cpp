@@ -1,6 +1,6 @@
 #include "action2D.h"
 #include "plbXmlController2D.h"
-
+#include "units.h"
 namespace Action {
 
   /*
@@ -29,7 +29,10 @@ namespace Action {
 		     plint const start_, plint const period_, plint const end_)
       : ActionClass2D(controller_), start(start_),period(period_),end(end_) {}
   PeriodicAction2D::~PeriodicAction2D() {}
-  bool PeriodicAction2D::performAtStep(plint n) const { return (n>=start && n<end && n%period==0);}
+  bool PeriodicAction2D::performAtStep(plint n) const 
+  { 
+    return n%period==0 && (n>=start || start == -1) && (n<end || end == -1);
+  }
 
   /*
    * implementation of OnceAction2D
@@ -58,25 +61,32 @@ namespace Action {
       a["type"].read(typeRead);
 
       if(typeRead.at(0).compare("once") == 0){
-	plint t = atoi(typeRead.at(1).c_str());
+	T physT = atof(typeRead.at(1).c_str());
+	plint t = controller->getUnits().numTimeSteps(physT);
 
 	if(t<0) throw PlbIOException("dummy");
 
 	actPtr = new OnceAction2D(controller,t);
 
       } else if(typeRead.at(0).compare("periodic") == 0){
-	plint nStart = atoi(typeRead.at(1).c_str());
-	plint nPeriod = atoi(typeRead.at(2).c_str());
-	plint nEnd = atoi(typeRead.at(3).c_str());
+	T tStart = atof(typeRead.at(1).c_str());
+	T tPeriod = atof(typeRead.at(2).c_str());
+	T tEnd = atof(typeRead.at(3).c_str());
+	
+	plint nStart = tStart < 0 ? -1 : controller->getUnits().numTimeSteps(tStart);
+	plint nPeriod = controller->getUnits().numTimeSteps(tPeriod);
+	plint nEnd = tEnd < 0 ? -1 : controller->getUnits().numTimeSteps(tEnd);
 
-	if(nStart<0 || nEnd<=nStart || nPeriod<1) throw PlbIOException("dummy");
+	if(nPeriod < 1) nPeriod == 1;
+	
+	if( nStart<-1 || (nEnd<=nStart && nEnd != -1) ) throw PlbIOException("dummy");
 
 	actPtr = new PeriodicAction2D(controller,nStart,nPeriod,nEnd);
 
       } else throw PlbIOException("dummy");
 
     } catch (std::exception &e){
-      throw PlbIOException("Invalid Action command: Unknowkn or no type specified");
+      throw PlbIOException("Invalid Action command with id " + id + ": Unknowkn or no type specified");
     }
 
     std::vector<XMLreader*> v = a.getChildren();

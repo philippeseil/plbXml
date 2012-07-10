@@ -1,6 +1,7 @@
 
 #include "plbXmlController2D.h"
 #include "ioUtils.h"
+#include "units.h"
 /*
  * ------------------------------------------------------------------
  * getters for various lists
@@ -10,6 +11,11 @@
 const IncomprFlowParam<T>&  PlbXmlController2D::getParams() const
 {
   return params;
+}
+
+const LBconverter<T>&  PlbXmlController2D::getUnits() const
+{
+  return units;
 }
 
 const RegionList& PlbXmlController2D::getRegionList() const
@@ -38,20 +44,51 @@ plint PlbXmlController2D::getNumSteps() const
  * --------------------------------------------------------------
  */
 
+LBconverter<T> PlbXmlController2D::calcUnits()
+{
+  XMLreaderProxy p(plbCase["parameters"]);
+  T latticeL, latticeU;
+  T physL, physU, physNu, physRho, pressureLevel;
+
+  int res;
+
+  p["resolution"].read(res);
+  p["physL"].read(physL);
+  p["physU"].read(physU);
+  p["latticeU"].read(latticeU);
+  p["physNu"].read(physNu);
+  p["physRho"].read(physRho);
+  p["pressureLevel"].read(pressureLevel);
+
+  LBconverter<T> units_(2,1./((T)res)*physL,latticeU,physNu,physL,physU,physRho,pressureLevel);
+
+  pcout << "delta X         : " << units_.getDeltaX() << std::endl;
+  pcout << "delta T         : " << units_.getDeltaT() << std::endl;
+  return units_;
+}
+
 IncomprFlowParam<T> PlbXmlController2D::calcParams()
 {
   XMLreaderProxy p(plbCase["parameters"]);
   
-  T physU(1.),latticeU(0.),Re(0.),physLength(1.),lx(0.),ly(0.);
+  T lx(0.),ly(0.);
   plint res(1);
 
-  p["latticeU"].read(latticeU);
-  p["Re"].read(Re);
   p["lx"].read(lx);
   p["ly"].read(ly);
-  p["Resolution"].read(res);
+  p["resolution"].read(res);
 
-  return IncomprFlowParam<T>(physU,latticeU,Re,physLength,res,lx,ly);
+  lx /= units.getCharL();
+  ly /= units.getCharL();
+  std::cout << lx << " " << ly << std::endl;
+  IncomprFlowParam<T> params_(1.,units.getLatticeU(),units.getRe(),1.,res,lx,ly);
+
+  pcout << "Lattice size    : " << params_.getNx() << " " << params.getNy() << std::endl;
+  pcout << "Reynolds number : " << params_.getRe() << std::endl;
+  pcout << "Lattice U       : " << params_.getLatticeU()<< std::endl;
+  pcout << "omega           : " << params_.getOmega() << std::endl;
+
+  return params_;
 }
 
 void PlbXmlController2D::buildRegionList()
@@ -148,11 +185,24 @@ OnLatticeBoundaryCondition2D<T,DESCRIPTOR>* PlbXmlController2D::createBoundaryCo
 
 /*
  * ---------------------------------------------------------------
- * lattice initializer
+ * lattice initializer functions
  * ---------------------------------------------------------------
  */
 
 void PlbXmlController2D::initializeLattice()
+{
+  setDynamics();
+  setBoundaries();
+
+  initializeAtEquilibrium(lattice,lattice.getBoundingBox(),1.,Array<T,2>(0.,0.));
+
+  if(ioUtils::elementExists(plbCase,"initValues"))
+    setInitValsFromFile();
+
+  lattice.initialize();
+}
+
+void PlbXmlController2D::setDynamics()
 {
   bool dummy, flag(true);
   if(ioUtils::elementExists(plbCase,"dynamicsFromRegion")){
@@ -182,6 +232,10 @@ void PlbXmlController2D::initializeLattice()
   }
   
 
+}
+
+void PlbXmlController2D::setBoundaries()
+{
   // iterate over boundary list to create boundary blocks
   BoundaryListIterator b;
   for(b = boundaryList.begin(); b != boundaryList.end(); b++){
@@ -196,9 +250,30 @@ void PlbXmlController2D::initializeLattice()
       boundaryCondition->setPressureConditionOnBlockBoundaries(lattice,reg,bc.getPlbBcType());
     }
   }
-  initializeAtEquilibrium(lattice,lattice.getBoundingBox(),1.,Array<T,2>(0.,0.));
 
-  lattice.initialize();
+}
+
+void PlbXmlController2D::setInitValsFromFile()
+{
+  XMLreaderProxy x = plbCase["initValues"];
+  std::string fname;
+  
+  if(ioUtils::elementExists(x,"pressureFile")){
+    x["pressureFile"].read(fname);
+    initializeAtEquilibrium(lattice,lattice.getBoundingBox(),
+			    ioUtils::SetPressureFromFile(this,fname));
+  }
+  if(ioUtils::elementExists(x,"vxFile")){
+    x["vxFile"].read(fname);
+    initializeAtEquilibrium(lattice,lattice.getBoundingBox(),
+			    ioUtils::SetVelocityFromFile(this,fname,0));
+  }
+  if(ioUtils::elementExists(x,"vyFile")){
+    x["vyFile"].read(fname);
+    initializeAtEquilibrium(lattice,lattice.getBoundingBox(),
+			    ioUtils::SetVelocityFromFile(this,fname,1));
+  }
+    
 }
 
 /*
@@ -249,7 +324,7 @@ void PlbXmlController2D::performActions(plint step)
 
 PlbXmlController2D::PlbXmlController2D(std::string &fname)
   : reader(fname), plbCase(reader["plbCase"]),
-    params(calcParams()), 
+    units(calcUnits()), params(calcParams()), 
     lattice(params.getNx(),params.getNy(),new NoDynamics<T,DESCRIPTOR>()),
     boundaryCondition(createBoundaryCondition()),
     nSteps(0), iStep(0)
@@ -259,11 +334,15 @@ PlbXmlController2D::PlbXmlController2D(std::string &fname)
   buildActionList();
 
   initializeLattice();
-  plbCase["run"].read(nSteps);
+  T time;
+  plbCase["run"].read(time);
+  nSteps = units.numTimeSteps(time);
+  
+  pcout << "Running for " << time << " seconds of physical time\n"
+	<< units.numTimeSteps(1) << " steps per second, " << nSteps << " total" << std::endl;
 
-  pcout << "Lattice size: " << params.getNx() << " " << params.getNy() << std::endl;
-  pcout << "Lattice U   : " << params.getLatticeU()<< std::endl;
-  pcout << "omega       : " << params.getOmega() << std::endl;
+  if(params.getOmega() < 0.5)
+    plbIOError("Omega too small (< 0.5)!");
 }
 
 PlbXmlController2D::~PlbXmlController2D()
