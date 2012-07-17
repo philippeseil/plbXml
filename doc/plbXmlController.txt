@@ -270,7 +270,8 @@ geometrical descriptions.
 :link(linkActions)
 Actions :h2
 
-Actions
+Actions documentation will have to wait until order of tasks in action
+tag is fixed ....
 
 <!-------------------------------------------------------
    Running
@@ -280,4 +281,8 @@ Actions
 :link(linkRunning)
 Running :h2
 
-running
+Running a simulation is simple: The tag
+
+<run>12.3</run> :displayhtml,pre
+
+will run the simulation for 12.3 seconds of physical time.
