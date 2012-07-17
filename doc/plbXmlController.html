@@ -1,0 +1,305 @@
+<HTML>
+<H1>PlbXmlController 
+</H1>
+<HR>
+
+<P>This is the documentation for the project PlbXmlController, an XML frontend
+ for the Lattice Boltzmann library <A HREF = "http://www.palabos.org">Palabos</A>. 
+</P>
+
+
+<!------------------------------------------------------- 
+   table of contents
+  ------------------------------------------------------->
+
+<HR>
+
+<H2>Table of Contents 
+</H2>
+<UL><LI><A HREF = "#linkIntroduction">Introduction</A> 
+<LI><A HREF = "#linkParameters">Parameters</A>
+<LI><A HREF = "#linkRegions">Regions</A> 
+<LI><A HREF = "#linkBoundaryConditions">Boundary Conditions</A>
+<LI><A HREF = "#linkDynamics">Dynamics</A>
+<LI><A HREF = "#linkActions">Actions</A>
+<LI><A HREF = "#linkRunning">Running</A>
+<LI>
+</UL>
+<!------------------------------------------------------ 
+   introduction
+-------------------------------------------------------->
+
+<HR>
+
+<A NAME = "linkIntroduction"></A>
+
+<H2>Introduction 
+</H2>
+The purpose of PlbXmlController is to give scripting access to the
+Palabos library. All input files that can be understood by
+PlbXmlController are therefor *.xml files that need to contain certain
+tags that will be explained below. A case is always defined inside the tag 
+<BR>
+<PRE>&lt;plbCase&gt;
+  ...
+&lt;/plbCase&gt;
+
+</PRE>
+<P>that holds all the further commands. In the following, it is assumed
+that the reader is familiar with lattice Boltzmann in general and
+maybe also has at least some experience with Palabos.
+</P>
+<H3>Tag Ids 
+</H3>
+<P>Throughout this documentation, tags of type
+</P>
+<PRE>&lt;someTag id=&quot;1&quot;&gt; &lt;/someTag&gt; 
+</PRE>
+<P>will appear. These are tags that can appear multiple times in an input
+file. Each of these tags needs a unique id (unique within its type) to
+be recognized by PlbXmlController. This id can take every numeric
+value (within the range of an integer), but no other characters. So if
+you want to define for example some regions, the following will work:
+</P>
+<PRE>&lt;region id=&quot;1&quot;&gt;
+  &lt;id&gt;myregion1&lt;/id&gt;
+  ...
+&lt;/region&gt;
+&lt;region id=&quot;2&quot;&gt;
+  &lt;id&gt;myregion2&lt;/id&gt;
+  ...
+&lt;/region&gt; 
+</PRE>
+Please keep also in mind that the numeric id=&quot;value&quot; does have nothing to do
+with the &lt;id&gt;someid&lt;/id&gt; tag. The former is only internally used to
+discriminate between different tags of the same type and does not have
+any other effect on the user, while the latter is a handle for the
+user to refer to some distinct element within the case. 
+
+<!------------------------------------------------------ 
+   parameters
+  ----------------------------------------------------->
+
+<HR>
+
+<A NAME = "linkParameters"></A>
+
+<H2>Parameters 
+</H2>
+<P>An important part of every lattice Boltzmann simulation is the
+definition of the parameters. The right choice of characteristic
+velocities etc is crucial to the correct conversion of units, time
+step width etc. An example tag for all the relevant values is given
+below:
+</P>
+<PRE>&lt;parameters&gt;
+  &lt;physL&gt;1&lt;/physL&gt;
+  &lt;physU&gt;1&lt;/physU&gt;
+  &lt;physNu&gt;1e-3&lt;/physNu&gt;
+  &lt;physRho&gt;1000.&lt;/physRho&gt;
+  &lt;pressureLevel&gt;0.&lt;/pressureLevel&gt;
+  &lt;latticeU&gt;0.02&lt;/latticeU&gt;
+  &lt;resolution&gt;200&lt;/resolution&gt;  
+  &lt;lx&gt;1&lt;/lx&gt;
+  &lt;ly&gt;1&lt;/ly&gt;
+&lt;/parameters&gt;
+
+</PRE>
+<P>The tags have the following meanings:
+</P>
+<UL>
+
+<LI><B>physL</B>, <B>physU</B>, <B>physNu</B> : In these tags, the characteristic length
+and velocity and the fluid viscosity are defined. These three values
+define the Reynolds number! 
+
+<LI><B>physRho</B> : The density of the fluid 
+
+<LI><B>pressureLevel</B> : An additional pressure level 
+
+<LI>[latticeU] : The characteristic lattice velocity. It is proportional
+to the Mach number and should generally be &lt;&lt; 1 
+
+<LI><B>resolution</B> : The number of grid points the physical length <B>physL</B>
+is discretized to. 
+
+<LI><B>lx</B>, <B>ly</B> : The size of the domain 
+
+
+</UL>
+<!------------------------------------------------------
+   region
+  ----------------------------------------------------->
+
+<HR>
+
+<H2>Regions 
+</H2>
+<A NAME = "linkRegions"></A>
+
+<P>Region tags are used to define, well, regions in the
+domain. Currently, only rectangular regions are supported. These are
+defined as follows:
+</P>
+<PRE>&lt;region id=&quot;1&quot;&gt;
+  &lt;id&gt;my_regid&lt;/id&gt;
+  &lt;x0&gt;10&lt;/x0&gt;
+  &lt;x1&gt;20&lt;/x1&gt;
+  &lt;y0&gt;15&lt;/y0&gt;
+  &lt;y1&gt;30&lt;/y1&gt;
+&lt;/region&gt;
+
+</PRE>
+<UL><LI><B>id</B> : A string that is used as an identifier for the region 
+
+<LI><B>x0</B>, <B>x1</B>, <B>y0</B>, <B>y1</B> : Beginning and end of region in x and y
+direction. Both points are included in the region, 
+
+
+</UL>
+<!------------------------------------------------------
+   Boundary conditions
+  ------------------------------------------------------>
+
+<HR>
+
+<A NAME = "linkBoundaryConditions"></A>
+
+<H2>Boundary conditions 
+</H2>
+<P>Boundary conditions are defined by a tag like
+</P>
+<PRE>&lt;boundary id=&quot;1&quot;&gt;
+  &lt;id&gt;inlet&lt;/id&gt;
+  &lt;regionId&gt;inletRegion&lt;/regionId&gt;
+  &lt;type&gt;pressure dirichlet&lt;/type&gt;
+&lt;/boundary&gt;
+
+</PRE>
+<UL><LI><B>id</B> : A string to identify the boundary condition 
+
+<LI><B>regionId</B> : The region where the boundary condition is defined. This
+region must be defined by a region tag as documented above. 
+
+<LI><B>type</B> : The type of the boundary condition 
+</UL>
+<P>Valid types are <I>pressure dirichlet</I>, <I>pressure neumann</I>, <I>velocity
+dirichlet</I>, <I>velocity neumann</I>, <I>velocity freeslip</I> and <I>velocity
+normalOutflow</I>. For explanations on these types, please consider the
+Palabos manual, section "Defining boundary conditions". Additionally,
+the general algorithm for boundary conditions must be defined by
+</P>
+<PRE>&lt;bcType&gt;type&lt;/bcType&gt; 
+</PRE>
+<P>where valid types are <I>regularized</I>, <I>interpolation</I>, <I>zou/he</I> and
+<I>inamuro</I>, the types are also explained in the palabos manual.
+</P>
+<!------------------------------------------------------
+   Dynamics
+  ----------------------------------------------------->
+
+<HR>
+
+<A NAME = "linkDynamics"></A>
+
+<H2>Dynamics 
+</H2>
+<P>For Palabos to simulate anything, dynamics need to be assigned to
+every lattice node. There are two ways to do this: either by defining
+them in a region or by reading geometry information from a file.
+</P>
+<H3>Dynamics types 
+</H3>
+<P>Currently the following dynamics types are implemented: (the <I>italic</I>
+string is the sting that has to be used for defining dynamics of this type)
+</P>
+<UL><LI><B>BGK dynamics</B>, <I>BGKdynamics</I> : The classic lattice Boltzmann
+collision algorithm 
+
+<LI><B>Regularized dynamics</B>, <I>RegularizedBGK</I> : regularized BGK dynamics 
+
+<B>Smagorinsky regularized dynamics</B>, <I>SmagorinskyRegularized c_smago</I> 
+
+<LI>A static Smagorinsky model on top of regularized BGK
+collision. <I>c_smago</I> needs to be replaced with the desired value of
+the Smagorinsky constant (usually between 0.1 and 0.2, depending on
+flow situation). 
+
+<LI><B>Bounce back</B>, <I>BounceBack</I> : Bounce-Back dynamics used for
+representation of static walls 
+
+<LI><B>No dynamics</B>, <I>NoDynamics</I> : Dummy object that does nothing. Can be
+assigned to solid nodes that have no fluid neighbors to save some
+calculation time. 
+
+
+</UL>
+<H3>Dynamics from region 
+</H3>
+<P>To define dynamics from a region defined by the <B>region</B> tag, use the
+following command:
+</P>
+<PRE>&lt;dynamicsFromRegion id=&quot;1&quot;&gt;
+  &lt;regionId&gt;reg&lt;/regionId&gt;
+  &lt;type&gt;dynamics_type (additional_values)&lt;/type&gt;
+&lt;/dynamicsFromRegion&gt;
+
+</PRE>
+<P>where <B>regionId</B> needs to be an id of a region defined above and
+<B>type</B> can be one of the strings named above. 
+</P>
+<H3>Dynamics from file 
+</H3>
+<P>It is possible to read dynamics from a file. This file must contain
+exactly one integer per lattice cell. These integers are read
+sequentially and interpreted to be continuous in x-direction. The tag
+for dynamics definition from file reads
+</P>
+<PRE>&lt;dynamicsFromFile id=&quot;1&quot;&gt;
+  &lt;type&gt;dynamics_type (additional_values)&lt;/type&gt;
+  &lt;fileName&gt;path/to/file&lt;/fileName&gt;
+  &lt;maskVal&gt;mask_val&lt;/maskVal&gt;
+&lt;/dynamicsFromFile&gt;
+
+</PRE>
+<P>where <B>type</B> is again the dynamics type as defined above, <B>fileName</B>
+must contain the path to a text file and <B>maskVal</B> is the value that
+denotes this dynamic object. For example,
+</P>
+<PRE>&lt;dynamicsFromFile id=&quot;1&quot;&gt;
+  &lt;type&gt;BounceBack&lt;/type&gt;
+  &lt;fileName&gt;geometry.txt&lt;/fileName&gt;
+  &lt;maskVal&gt;1&lt;/maskVal&gt;
+&lt;/dynamicsFromFile&gt;
+
+</PRE>
+<P>will create bounce back dynamics whenever it reads a "1" in
+geometry.txt. Using this approach, it is possible to create complex
+geometries as an integer array in eg. matlab or octave from
+geometrical descriptions.
+</P>
+<!-------------------------------------------------------
+   Actions
+  ------------------------------------------------------>
+
+<HR>
+
+<A NAME = "linkActions"></A>
+
+<H2>Actions 
+</H2>
+<P>Actions
+</P>
+<!-------------------------------------------------------
+   Running
+  ------------------------------------------------------>
+
+<HR>
+
+<A NAME = "linkRunning"></A>
+
+<H2>Running 
+</H2>
+<P>running
+</P>
+</HTML>
