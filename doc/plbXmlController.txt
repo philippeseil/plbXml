@@ -1,0 +1,288 @@
+PlbXmlController :h1
+
+:line
+
+This is the documentation for the project PlbXmlController, an XML frontend
+ for the Lattice Boltzmann library "Palabos"_plbLink. 
+
+:link(plbLink,http://www.palabos.org)
+
+<!------------------------------------------------------- 
+   table of contents
+  ------------------------------------------------------->
+
+:line
+
+Table of Contents :h2
+
+"Introduction"_#linkIntroduction 
+"Parameters"_#linkParameters
+"Regions"_#linkRegions 
+"Boundary Conditions"_#linkBoundaryConditions
+"Dynamics"_#linkDynamics
+"Actions"_#linkActions
+"Running"_#linkRunning
+:ul
+
+<!------------------------------------------------------ 
+   introduction
+-------------------------------------------------------->
+
+:line
+:link(linkIntroduction)
+Introduction :h2
+
+The purpose of PlbXmlController is to give scripting access to the
+Palabos library. All input files that can be understood by
+PlbXmlController are therefor *.xml files that need to contain certain
+tags that will be explained below. A case is always defined inside the tag :b 
+
+<plbCase>
+  ...
+</plbCase>
+:displayhtml,pre
+
+that holds all the further commands. In the following, it is assumed
+that the reader is familiar with lattice Boltzmann in general and
+maybe also has at least some experience with Palabos.
+
+Tag Ids :h3
+
+Throughout this documentation, tags of type
+
+<someTag id="1"> </someTag> :displayhtml,pre
+
+will appear. These are tags that can appear multiple times in an input
+file. Each of these tags needs a unique id (unique within its type) to
+be recognized by PlbXmlController. This id can take every numeric
+value (within the range of an integer), but no other characters. So if
+you want to define for example some regions, the following will work:
+
+<region id="1">
+  <id>myregion1</id>
+  ...
+</region>
+<region id="2">
+  <id>myregion2</id>
+  ...
+</region> :displayhtml,pre
+
+Please keep also in mind that the numeric id="value" does have nothing to do
+with the <id>someid</id> tag. The former is only internally used to
+discriminate between different tags of the same type and does not have
+any other effect on the user, while the latter is a handle for the
+user to refer to some distinct element within the case. :displayhtml
+
+
+<!------------------------------------------------------ 
+   parameters
+  ----------------------------------------------------->
+
+:line
+:link(linkParameters)
+Parameters :h2
+
+An important part of every lattice Boltzmann simulation is the
+definition of the parameters. The right choice of characteristic
+velocities etc is crucial to the correct conversion of units, time
+step width etc. An example tag for all the relevant values is given
+below:
+
+<parameters>
+  <physL>1</physL>
+  <physU>1</physU>
+  <physNu>1e-3</physNu>
+  <physRho>1000.</physRho>
+  <pressureLevel>0.</pressureLevel>
+  <latticeU>0.02</latticeU>
+  <resolution>200</resolution>  
+  <lx>1</lx>
+  <ly>1</ly>
+</parameters>
+:displayhtml,pre
+
+The tags have the following meanings:
+
+:ulb
+[physL], [physU], [physNu] : In these tags, the characteristic length
+and velocity and the fluid viscosity are defined. These three values
+define the Reynolds number! :l
+[physRho] : The density of the fluid :l
+[pressureLevel] : An additional pressure level :l
+[latticeU] : The characteristic lattice velocity. It is proportional
+to the Mach number and should generally be << 1 :displayhtml,l
+[resolution] : The number of grid points the physical length [physL]
+is discretized to. :l
+[lx], [ly] : The size of the domain :l
+:ule
+
+<!------------------------------------------------------
+   region
+  ----------------------------------------------------->
+
+:line
+
+Regions :h2
+
+:link(linkRegions)
+
+Region tags are used to define, well, regions in the
+domain. Currently, only rectangular regions are supported. These are
+defined as follows:
+
+<region id="1">
+  <id>my_regid</id>
+  <x0>10</x0>
+  <x1>20</x1>
+  <y0>15</y0>
+  <y1>30</y1>
+</region>
+:displayhtml,pre
+
+[id] : A string that is used as an identifier for the region :ulb,l
+[x0], [x1], [y0], [y1] : Beginning and end of region in x and y
+direction. Both points are included in the region, :l
+:ule
+
+<!------------------------------------------------------
+   Boundary conditions
+  ------------------------------------------------------>
+
+:line
+:link(linkBoundaryConditions)
+Boundary conditions :h2
+
+Boundary conditions are defined by a tag like
+
+<boundary id="1">
+  <id>inlet</id>
+  <regionId>inletRegion</regionId>
+  <type>pressure dirichlet</type>
+</boundary>
+:displayhtml,pre
+
+[id] : A string to identify the boundary condition :ulb,l
+[regionId] : The region where the boundary condition is defined. This
+region must be defined by a region tag as documented above. :l
+[type] : The type of the boundary condition :l,ule
+
+Valid types are {pressure dirichlet}, {pressure neumann}, {velocity
+dirichlet}, {velocity neumann}, {velocity freeslip} and {velocity
+normalOutflow}. For explanations on these types, please consider the
+Palabos manual, section "Defining boundary conditions". Additionally,
+the general algorithm for boundary conditions must be defined by
+
+<bcType>type</bcType> :displayhtml,pre
+
+where valid types are {regularized}, {interpolation}, {zou/he} and
+{inamuro}, the types are also explained in the palabos manual.
+
+
+<!------------------------------------------------------
+   Dynamics
+  ----------------------------------------------------->
+
+:line
+:link(linkDynamics)
+Dynamics :h2
+
+For Palabos to simulate anything, dynamics need to be assigned to
+every lattice node. There are two ways to do this: either by defining
+them in a region or by reading geometry information from a file.
+
+Dynamics types :h3
+
+Currently the following dynamics types are implemented: (the {italic}
+string is the sting that has to be used for defining dynamics of this type)
+
+[BGK dynamics], {BGKdynamics} : The classic lattice Boltzmann
+collision algorithm :ulb,l 
+
+[Regularized dynamics], {RegularizedBGK} : regularized BGK dynamics :l 
+
+[Smagorinsky regularized dynamics], {SmagorinskyRegularized c_smago} :
+A static Smagorinsky model on top of regularized BGK
+collision. {c_smago} needs to be replaced with the desired value of
+the Smagorinsky constant (usually between 0.1 and 0.2, depending on
+flow situation). :l
+
+[Bounce back], {BounceBack} : Bounce-Back dynamics used for
+representation of static walls :l
+
+[No dynamics], {NoDynamics} : Dummy object that does nothing. Can be
+assigned to solid nodes that have no fluid neighbors to save some
+calculation time. :l
+
+:ule
+
+
+Dynamics from region :h3
+
+To define dynamics from a region defined by the [region] tag, use the
+following command:
+
+<dynamicsFromRegion id="1">
+  <regionId>reg</regionId>
+  <type>dynamics_type (additional_values)</type>
+</dynamicsFromRegion>
+:displayhtml,pre
+
+where [regionId] needs to be an id of a region defined above and
+[type] can be one of the strings named above. 
+
+
+Dynamics from file :h3
+
+It is possible to read dynamics from a file. This file must contain
+exactly one integer per lattice cell. These integers are read
+sequentially and interpreted to be continuous in x-direction. The tag
+for dynamics definition from file reads
+
+<dynamicsFromFile id="1">
+  <type>dynamics_type (additional_values)</type>
+  <fileName>path/to/file</fileName>
+  <maskVal>mask_val</maskVal>
+</dynamicsFromFile>
+:displayhtml,pre
+
+where [type] is again the dynamics type as defined above, [fileName]
+must contain the path to a text file and [maskVal] is the value that
+denotes this dynamic object. For example,
+
+<dynamicsFromFile id="1">
+  <type>BounceBack</type>
+  <fileName>geometry.txt</fileName>
+  <maskVal>1</maskVal>
+</dynamicsFromFile>
+:displayhtml,pre
+
+will create bounce back dynamics whenever it reads a "1" in
+geometry.txt. Using this approach, it is possible to create complex
+geometries as an integer array in eg. matlab or octave from
+geometrical descriptions.
+
+
+<!-------------------------------------------------------
+   Actions
+  ------------------------------------------------------>
+
+:line
+:link(linkActions)
+Actions :h2
+
+Actions documentation will have to wait until order of tasks in action
+tag is fixed ....
+
+<!-------------------------------------------------------
+   Running
+  ------------------------------------------------------>
+
+:line
+:link(linkRunning)
+Running :h2
+
+Running a simulation is simple: The tag
+
+<run>12.3</run> :displayhtml,pre
+
+will run the simulation for 12.3 seconds of physical time.
