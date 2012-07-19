@@ -33,9 +33,6 @@
 #include <fstream>
 #include <cmath>
 
-/// All OpenLB code is contained in this namespace.
-
-
 /// Conversion between lattice units and physical units
 /// physXYZ(lattice quantity XYZ) returns the physical size of a lattice quantity XYZ
 template<typename T>

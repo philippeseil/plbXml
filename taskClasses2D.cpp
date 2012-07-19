@@ -1,35 +1,10 @@
 #include "taskClasses2D.h"
 #include "plbHeaders2D.h"
 #include "plbXmlController2D.h"
-#include "memory.h"
+#include "ioUtils.h"
 #include <fstream>
 
 namespace Task{
-  /*
-   * ------------------------------------------------------------
-   * class SetDynamics
-   * ------------------------------------------------------------
-   */
-  
-  SetDynamics::SetDynamics(PlbXmlController2D const *controller_, 
-			   std::string regionId_, plb::Dynamics<T,DESCRIPTOR> *dyn_) 
-    : TaskBase(controller_), regionId(regionId_), dyn(dyn_)
-  {
-    
-  }
-
-  SetDynamics::~SetDynamics()
-  {
-    delete dyn;
-  }
-  void SetDynamics::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			    OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			    plint nStep)
-  {
-    Box2D reg( (controller->getRegionList()).find(regionId)->second );
-    defineDynamics(lattice, reg, dyn->clone());
-    std::cout << "Defined dynamics" << std::endl;
-  };
   
   /*
    * ------------------------------------------------------------
@@ -40,6 +15,20 @@ namespace Task{
   SetPressureBc::SetPressureBc(PlbXmlController2D const *controller, Box2D const &reg_, T val_)
     : TaskBase(controller), reg(reg_), physVal(0.), val(0.)
   {
+    setVal(val_);
+  }
+
+  SetPressureBc::SetPressureBc(PlbXmlController2D const *controller, XMLreaderProxy const &r)
+    : TaskBase(controller), reg(ioUtils::bcBoxFromXml(controller,r)), physVal(0.), val(0.)
+  {
+    T val_;
+
+    try{
+      r["bcValue"].read(val_);
+    }catch (PlbIOException &e){
+      plbIOError("No value for pressure boundary condition specified");
+    }
+ 
     setVal(val_);
   }
 
@@ -69,13 +58,16 @@ namespace Task{
    * -----------------------------------------------------------
    */
 
-  SetPressureBcFromFile::SetPressureBcFromFile(PlbXmlController2D const *controller, Box2D const &reg,
-					       std::string const &fname)
-    : SetPressureBc(controller,reg,0.), 
+  SetPressureBcFromFile::SetPressureBcFromFile(PlbXmlController2D const *controller, 
+					       XMLreaderProxy const &r)
+    : SetPressureBc(controller,ioUtils::bcBoxFromXml(controller,r),0.), 
       constantFlag(false), startFlag(true), endFlag(false),
       cursor(0), nStepThis(0), nStepNext(0)
   {
     T tTmp,pTmp;
+    std::string fname;
+    r["valFile"].read(fname);
+
     std::ifstream file(fname.c_str());
 
     while(!file.eof()){
@@ -98,6 +90,8 @@ namespace Task{
 
     file.close();
   }
+
+  
   
 
   SetPressureBcFromFile::~SetPressureBcFromFile()
@@ -147,6 +141,13 @@ namespace Task{
     setVal(val_);
   }
 
+  SetVelocityBc::SetVelocityBc(PlbXmlController2D const *controller, XMLreaderProxy const &r)
+    : TaskBase(controller), reg(ioUtils::bcBoxFromXml(controller,r))
+  {
+    std::vector<T> val;
+    r["bcValue"].read(val);
+    setVal(Array<T,2>(val[0],val[1]));
+  }
   SetVelocityBc::~SetVelocityBc()
   {
 
@@ -165,20 +166,23 @@ namespace Task{
     setBoundaryVelocity(lattice, reg, val );
     initializeAtEquilibrium(lattice,reg,1.,val);
   };
-
+  
   /*
    * ---------------------------------------------------------------
    * class SetVelocityBcFromFile
    * ---------------------------------------------------------------
    */
 
-  SetVelocityBcFromFile::SetVelocityBcFromFile(PlbXmlController2D const *controller, Box2D const &reg,
-					       std::string const &fname)
-    : SetVelocityBc(controller,reg,Array<T,2>(0.,0.)), 
+  SetVelocityBcFromFile::SetVelocityBcFromFile(PlbXmlController2D const *controller, 
+					       XMLreaderProxy const &r)
+    : SetVelocityBc(controller,ioUtils::bcBoxFromXml(controller,r),Array<T,2>(0.,0.)), 
       constantFlag(false), startFlag(true), endFlag(false),
       cursor(0), nStepThis(0), nStepNext(0)
   {
     T tTmp,vxTmp,vyTmp;
+
+    std::string fname;
+    r["valFile"].read(fname);
     std::ifstream file(fname.c_str());
 
     while(!file.eof()){
@@ -246,11 +250,15 @@ namespace Task{
    * class WriteVtk
    * ------------------------------------------------------------
    */
- 
-  WriteVtk::WriteVtk(PlbXmlController2D const *controller, std::string const &prefix_)
-    : TaskBase(controller), prefix(prefix_)
-  {
 
+  WriteVtk::WriteVtk(PlbXmlController2D const *controller, XMLreaderProxy const &r)
+    : TaskBase(controller)
+  {
+    try{
+      r["fileName"].read(prefix);
+    } catch(PlbIOException &e) {
+      plbIOError("No file name for VTK output specified");
+    }
   }
 
   WriteVtk::~WriteVtk()

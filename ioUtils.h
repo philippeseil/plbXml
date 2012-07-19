@@ -11,7 +11,7 @@ namespace plb{
 }
 namespace ioUtils{
   bool elementExists(plb::XMLreaderProxy const &reader, std::string const &elemId);
-
+  plb::Box2D bcBoxFromXml(PlbXmlController2D const *controller, XMLreaderProxy const &r);
   
 
   class SetValueFromFile{
