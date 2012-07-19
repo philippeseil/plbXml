@@ -15,6 +15,21 @@ namespace ioUtils{
     return flag;
   }
 
+  plb::Box2D bcBoxFromXml(PlbXmlController2D const *controller, XMLreaderProxy const &r)
+  {
+    std::string bcId;
+    try{
+      r["bcId"].read(bcId);
+    } catch(PlbIOException &e) {
+      plbIOError("Invalid Set Pressure BC command");
+    }
+    ConstBoundaryListIterator b = (controller->getBoundaryList()).find(bcId);
+    if(b == (controller->getBoundaryList()).end())
+      plbIOError("Invalid boundary ID " + bcId);
+    
+    return (b->second).getRegion();
+  }
+
   SetValueFromFile::SetValueFromFile(PlbXmlController2D const *controller_, std::string const &fname)
     : controller(controller_)
   {

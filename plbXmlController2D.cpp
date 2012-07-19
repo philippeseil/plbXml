@@ -60,10 +60,19 @@ LBconverter<T> PlbXmlController2D::calcUnits()
   p["physRho"].read(physRho);
   p["pressureLevel"].read(pressureLevel);
 
-  LBconverter<T> units_(2,1./((T)res)*physL,latticeU,physNu,physL,physU,physRho,pressureLevel);
+  LBconverter<T> units_(2, // dimensions
+			1./((T)res)*physL, // phys. length of a lattice cell
+			latticeU, // lattice velocity
+			physNu, // physical viscosity
+			physL, // physical characteristic length
+			physU, // physical characteristic velocity
+			physRho, // physical density of fluid
+			pressureLevel); // an additive pressure level
 
-  pcout << "delta X         : " << units_.getDeltaX() << std::endl;
-  pcout << "delta T         : " << units_.getDeltaT() << std::endl;
+  pcout << "Characteristic Length   : " << units_.getCharL() << "\n"
+	<< "Characteristic Velocity : " << units_.getCharU() << "\n"
+	<< "Characteristic Time     : " << units_.getCharTime() << std::endl;
+
   return units_;
 }
 
@@ -80,10 +89,10 @@ IncomprFlowParam<T> PlbXmlController2D::calcParams()
 
   lx /= units.getCharL();
   ly /= units.getCharL();
-  std::cout << lx << " " << ly << std::endl;
+
   IncomprFlowParam<T> params_(1.,units.getLatticeU(),units.getRe(),1.,res,lx,ly);
 
-  pcout << "Lattice size    : " << params_.getNx() << " " << params.getNy() << std::endl;
+  pcout << "Lattice size    : " << params_.getNx() << " " << params_.getNy() << std::endl;
   pcout << "Reynolds number : " << params_.getRe() << std::endl;
   pcout << "Lattice U       : " << params_.getLatticeU()<< std::endl;
   pcout << "omega           : " << params_.getOmega() << std::endl;
@@ -310,7 +319,7 @@ void PlbXmlController2D::performActions(plint step)
       Task::TaskList const t = (it->second)->getTaskList();
       for(Task::TaskListConstIterator tlIt = t.begin();
 	 tlIt != t.end(); ++tlIt){
-	(*tlIt)->perform(lattice,*boundaryCondition,step);
+	(*tlIt)->perform(lattice,step);
       }
     }
   }

@@ -98,7 +98,7 @@ namespace Action {
       plint id = v[i]->getFirstId();
       do{
 	XMLreaderProxy p(v[i],id);
-	actPtr->addTask(Task::taskFromXml(controller, p));
+	actPtr->addTask(Task::cont.f.create(controller, p));
       } while (v[i]->getNextId(id));
     }
     return Action2D(id,actPtr);

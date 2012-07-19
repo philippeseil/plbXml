@@ -7,8 +7,8 @@
 #include <string>
 #include <exception>
 
-#include "task2D.h"
-
+#include "taskBase.h"
+#include "taskFactory2D.h"
 namespace plb{
   class XMLreaderProxy;
 };
