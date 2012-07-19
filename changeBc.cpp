@@ -43,7 +43,6 @@ namespace Task{
     val = (controller->getUnits()).latticePressure(physVal)+1.;
   }
   void SetPressureBc::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 			      plint nStep)
   {
     pcout << "boundary pressure set to " << physVal << " " << controller->getUnits().physPressure(val)
@@ -100,7 +99,6 @@ namespace Task{
   }
 
   void SetPressureBcFromFile::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-				      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 				      plint nStep)
   {
     if(constantFlag || endFlag) return;
@@ -126,7 +124,7 @@ namespace Task{
       setVal(dt*(p[cursor+1]-p[cursor]) + p[cursor]);
     }
 
-    if(startFlag) SetPressureBc::perform(lattice,boundaryCondition,nStep);
+    if(startFlag) SetPressureBc::perform(lattice,nStep);
   }
 
   /*
@@ -159,7 +157,6 @@ namespace Task{
     val[1] = (controller->getUnits()).latticeVelocity(physVal[1]);
   }
   void SetVelocityBc::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 			      plint nStep)
   {
     pcout << "boundary velocity set to " << val[0] << " " << val[1] << std::endl;
@@ -212,7 +209,6 @@ namespace Task{
   }
 
   void SetVelocityBcFromFile::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-				      OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 				      plint nStep)
   {
     if(constantFlag || endFlag) return;
@@ -240,7 +236,7 @@ namespace Task{
       setVal(Array<T,2>(vxTmp,vyTmp));
     }
 
-    if(startFlag) SetVelocityBc::perform(lattice,boundaryCondition,nStep);
+    if(startFlag) SetVelocityBc::perform(lattice,nStep);
   }
 
 

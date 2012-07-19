@@ -24,7 +24,6 @@ namespace Task {
   }
 
   void WriteVtk::perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 			 plint nStep)
   {
     T dx = controller->getParams().getDeltaX();

@@ -30,7 +30,6 @@ namespace Task {
     SetPressureBc(PlbXmlController2D const *controller, XMLreaderProxy const &r);
     virtual ~SetPressureBc();
     virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 			 plint nStep);
   protected:
     void setVal(T physVal);
@@ -47,7 +46,6 @@ namespace Task {
 			  XMLreaderProxy const &r);
     virtual ~SetPressureBcFromFile();
     virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice,
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 			 plint nStep);
   private:
     std::vector<T> t,p;
@@ -60,7 +58,6 @@ namespace Task {
     SetVelocityBc(PlbXmlController2D const *controller, XMLreaderProxy const &r);
     virtual ~SetVelocityBc();
     virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 			 plint nStep);
   protected:
     void setVal(Array<T,2> physVal);
@@ -75,7 +72,6 @@ namespace Task {
     SetVelocityBcFromFile(PlbXmlController2D const *controller, XMLreaderProxy const &r);
     virtual ~SetVelocityBcFromFile();
     virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 			 plint nStep);
     friend TaskBase* setVelocityBcFromXml(PlbXmlController2D const *controller, 
 					  XMLreaderProxy const &r);

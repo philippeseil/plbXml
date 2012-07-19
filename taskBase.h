@@ -16,7 +16,6 @@ namespace Task {
     PlbXmlController2D const *controller;
   public:
     virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 			 plint nStep) =0;
   };
 } // namespace Task

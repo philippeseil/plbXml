@@ -319,7 +319,7 @@ void PlbXmlController2D::performActions(plint step)
       Task::TaskList const t = (it->second)->getTaskList();
       for(Task::TaskListConstIterator tlIt = t.begin();
 	 tlIt != t.end(); ++tlIt){
-	(*tlIt)->perform(lattice,*boundaryCondition,step);
+	(*tlIt)->perform(lattice,step);
       }
     }
   }

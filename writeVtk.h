@@ -16,7 +16,6 @@ public:
   WriteVtk(PlbXmlController2D const *controller, XMLreaderProxy const &r);
   virtual ~WriteVtk();
   virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-		       OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
 		       plint nStep);
 private:
   std::string prefix;
