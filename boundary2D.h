@@ -9,7 +9,7 @@
 #include "region2D.h"
 #include "boundaryCondition/boundaryCondition.h"
 #include "core/geometry2D.h"
-
+#include "taskBase.h"
 class PlbXmlController2D;
 
 namespace plb{

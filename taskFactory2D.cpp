@@ -1,6 +1,6 @@
 #include "taskFactory2D.h"
-#include "taskClasses2D.h"
 #include "ioUtils.h"
+#include "taskFactoryAggregateHeader2D.hh"
 
 #include "plbXmlController2D.h"
 #include "plbHeaders2D.h"
@@ -11,11 +11,7 @@ namespace Task{
 
   TaskFactory::TaskFactory()
   {
-    addToTaskMap<WriteVtk>("writeVtk");
-    addToTaskMap<SetPressureBc>("setPressureBc");
-    addToTaskMap<SetPressureBcFromFile>("setPressureBcFromFile");
-    addToTaskMap<SetVelocityBc>("setVelocityBc");
-    addToTaskMap<SetVelocityBcFromFile>("setVelocityBcFromFile");
+    #include "taskFactoryInitializer2D.hh"
   }
 
   TaskBase* TaskFactory::create(PlbXmlController2D const *controller,

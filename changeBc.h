@@ -1,8 +1,15 @@
 #ifndef TASKCLASSES2D_H_LBDEM
 #define TASKCLASSES2D_H_LBDEM
 
-#include "plbHeaders2D.h"
+#ifdef TASK_LIST
+addToTaskMap<SetPressureBc>("setPressureBc");
+addToTaskMap<SetPressureBcFromFile>("setPressureBcFromFile");
+addToTaskMap<SetVelocityBc>("setVelocityBc");
+addToTaskMap<SetVelocityBcFromFile>("setVelocityBcFromFile");
+#else
 
+#include "plbHeaders2D.h"
+#include "taskBase.h"
 #include "globalDefs.h"
 #include "boundary2D.h"
 #include "region2D.h"
@@ -16,36 +23,7 @@ template<typename T> class SingleTaskFactory;
 
 namespace Task {
   
-  class TaskBase{
-  protected:
-    TaskBase(PlbXmlController2D const *controller_) : controller(controller_) {}
-    virtual ~TaskBase() {}
-    PlbXmlController2D const *controller;
-  public:
-    virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			 plint nStep) =0;
-  };
 
-  class WriteVtk : public TaskBase {
-  public:
-    WriteVtk(PlbXmlController2D const *controller, XMLreaderProxy const &r);
-    virtual ~WriteVtk();
-    virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
-			 OnLatticeBoundaryCondition2D<T,DESCRIPTOR> &boundaryCondition,
-			 plint nStep);
-  private:
-    std::string prefix;
-    
-    struct PressureFromRho {
-      PressureFromRho(PlbXmlController2D const *controller_);
-      T operator()(T rho);
-    private:
-      LBconverter<T> const &units;
-    };
-    
-
-  };
 
   class SetPressureBc : public TaskBase {
   public:
@@ -111,5 +89,5 @@ namespace Task {
 };
 
 
-
+#endif /* TASK_LIST */
 #endif /* TASKCLASSES2D_H_LBDEM */

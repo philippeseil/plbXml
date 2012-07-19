@@ -7,7 +7,7 @@
 #include "plbXmlController2D.h"
 #include "region2D.h"
 #include "globalDefs.h"
-#include "task2D.h"
+#include "taskFactory2D.h"
 
 #include <string>
 #include <iostream>

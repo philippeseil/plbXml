@@ -3,11 +3,15 @@
 
 #include "plbHeaders2D.h"
 
-#include "taskClasses2D.h"
+#include "taskBase.h"
 
 using namespace plb;
 
 namespace Task {
+
+  typedef std::list<TaskBase*> TaskList;
+  typedef std::list<TaskBase*>::iterator TaskListIterator;
+  typedef std::list<TaskBase*>::const_iterator TaskListConstIterator;
 
   struct SingleTaskFactoryBase{
     virtual TaskBase* create(PlbXmlController2D const *controller,
