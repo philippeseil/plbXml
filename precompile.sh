@@ -3,14 +3,13 @@
 INITIALIZER=taskFactoryInitializer2D.hh
 HEADER=taskFactoryAggregateHeader2D.hh
 
-HDR_TMP=hdr.txt
 SRC_TMP=src.txt
 TMP=tmp.txt
 
-rm -f $HEADER $INITIALIZER $HDR_TMP $SRC_TMP > /dev/null 2> /dev/null;
+rm -f $HEADER $INITIALIZER $SRC_TMP > /dev/null 2> /dev/null;
 
-ls *.h | tr '\n' ' ' > hdr.txt
-ls *.cpp | tr '\n' ' ' > src.txt
+ls *.cpp | grep -v plbXml.cpp | tr '\n' ' ' > $SRC_TMP
+
 
 for file in $(ls *.h);
 do
@@ -22,7 +21,7 @@ do
 	continue
     fi
     cpp -DTASK_LIST < $file > $TMP
-    grep insertInList $TMP >> $INITIALIZER
+    grep addToTaskMap $TMP | tee -a $INITIALIZER
     echo "#include \""$file"\"" >> $HEADER
 done;
 

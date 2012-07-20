@@ -1,3 +1,25 @@
+/* --------------------------------------------------------------------- 
+
+Copyright 2012 Philippe Seil
+
+This file is part of plbXml.
+
+plbXml is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 2 of the License, or (at
+your option) any later version.
+
+plbXml is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with plbXml. If not, see http://www.gnu.org/licenses/.
+
+---------------------------------------------------------------------- */
+
+
 
 #include "plbXmlController2D.h"
 #include "ioUtils.h"
@@ -317,6 +339,7 @@ void PlbXmlController2D::performActions(plint step)
   for(ActionListIterator it=actionList.begin(); it != actionList.end(); ++it){
     if((it->second)->performAtStep(step)){
       Task::TaskList const t = (it->second)->getTaskList();
+      pcout << "Performing action " << it->first << " at step " << step << std::endl;
       for(Task::TaskListConstIterator tlIt = t.begin();
 	 tlIt != t.end(); ++tlIt){
 	(*tlIt)->perform(lattice,step);

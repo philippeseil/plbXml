@@ -20,36 +20,31 @@ along with plbXml. If not, see http://www.gnu.org/licenses/.
 ---------------------------------------------------------------------- */
 
 
-#include "taskFactory2D.h"
-#include "ioUtils.h"
-#include "taskFactoryAggregateHeader2D.hh"
+/*
+ * main file to test functions of plbXmlController2D
+ */
 
-#include "plbXmlController2D.h"
 #include "plbHeaders2D.h"
 
-using namespace plb;
+#include "plbXmlController2D.h"
+#include "region2D.h"
+#include "globalDefs.h"
+#include "taskFactory2D.h"
 
-namespace Task{
-
-  TaskFactory::TaskFactory()
-  {
-    #include "taskFactoryInitializer2D.hh"
-  }
-
-  TaskBase* TaskFactory::create(PlbXmlController2D const *controller,
-				XMLreaderProxy const &t)
-  {
-    std::string type = t.getName();
-    TaskMap::iterator pos = taskMap.find(type);
-    if(pos != taskMap.end()){
-      pcout << "Creating task of type " << type << std::endl;
-      return pos->second->create(controller,t);
-    } else{
-      pcout << "Task type " << type << " not found" << std::endl;
-      return 0;
-    }
-  }
+#include <string>
+#include <iostream>
 
 
+int main(int argc, char **argv)
+{
+  plb::plbInit(&argc,&argv);
 
-};
+  std::string fName;
+  global::argv(1).readNoThrow(fName);
+
+  PlbXmlController2D p(fName);
+  plint n = p.getNumSteps();
+  p.run(n);
+
+  return 0;
+}
