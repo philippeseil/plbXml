@@ -2,7 +2,7 @@
 #include "plbXmlController2D.h"
 namespace Task {
   WriteVtk::WriteVtk(PlbXmlController2D const *controller, XMLreaderProxy const &r)
-    : TaskBase(controller)
+    : TaskBase(controller,r.getId())
   {
     try{
       r["fileName"].read(prefix);

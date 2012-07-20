@@ -12,14 +12,15 @@ namespace Task{
    * ------------------------------------------------------------
    */
  
-  SetPressureBc::SetPressureBc(PlbXmlController2D const *controller, Box2D const &reg_, T val_)
-    : TaskBase(controller), reg(reg_), physVal(0.), val(0.)
+  SetPressureBc::SetPressureBc(PlbXmlController2D const *controller, Box2D const &reg_,
+			       T val_, plint id)
+    : TaskBase(controller,id), reg(reg_), physVal(0.), val(0.)
   {
     setVal(val_);
   }
 
   SetPressureBc::SetPressureBc(PlbXmlController2D const *controller, XMLreaderProxy const &r)
-    : TaskBase(controller), reg(ioUtils::bcBoxFromXml(controller,r)), physVal(0.), val(0.)
+    : TaskBase(controller,r.getId()), reg(ioUtils::bcBoxFromXml(controller,r)), physVal(0.), val(0.)
   {
     T val_;
 
@@ -59,7 +60,7 @@ namespace Task{
 
   SetPressureBcFromFile::SetPressureBcFromFile(PlbXmlController2D const *controller, 
 					       XMLreaderProxy const &r)
-    : SetPressureBc(controller,ioUtils::bcBoxFromXml(controller,r),0.), 
+    : SetPressureBc(controller,ioUtils::bcBoxFromXml(controller,r),0.,r.getId()), 
       constantFlag(false), startFlag(true), endFlag(false),
       cursor(0), nStepThis(0), nStepNext(0)
   {
@@ -133,14 +134,15 @@ namespace Task{
    * ------------------------------------------------------------
    */
  
-  SetVelocityBc::SetVelocityBc(PlbXmlController2D const *controller, Box2D const &reg_, Array<T,2> const &val_)
-    : TaskBase(controller), reg(reg_)
+  SetVelocityBc::SetVelocityBc(PlbXmlController2D const *controller, Box2D const &reg_,
+			       Array<T,2> const &val_, plint id)
+    : TaskBase(controller,id), reg(reg_)
   {
     setVal(val_);
   }
 
   SetVelocityBc::SetVelocityBc(PlbXmlController2D const *controller, XMLreaderProxy const &r)
-    : TaskBase(controller), reg(ioUtils::bcBoxFromXml(controller,r))
+    : TaskBase(controller,r.getId()), reg(ioUtils::bcBoxFromXml(controller,r))
   {
     std::vector<T> val;
     r["bcValue"].read(val);
@@ -172,7 +174,7 @@ namespace Task{
 
   SetVelocityBcFromFile::SetVelocityBcFromFile(PlbXmlController2D const *controller, 
 					       XMLreaderProxy const &r)
-    : SetVelocityBc(controller,ioUtils::bcBoxFromXml(controller,r),Array<T,2>(0.,0.)), 
+    : SetVelocityBc(controller,ioUtils::bcBoxFromXml(controller,r),Array<T,2>(0.,0.),r.getId()), 
       constantFlag(false), startFlag(true), endFlag(false),
       cursor(0), nStepThis(0), nStepNext(0)
   {

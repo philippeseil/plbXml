@@ -34,7 +34,8 @@ namespace Task {
   protected:
     void setVal(T physVal);
     T valFromXml(XMLreaderProxy const &r);
-    SetPressureBc(PlbXmlController2D const *controller, Box2D const &reg_, T val);
+    SetPressureBc(PlbXmlController2D const *controller, Box2D const &reg_,
+		  T val, plint id);
   private:
     Box2D reg;
     T val,physVal;
@@ -61,7 +62,8 @@ namespace Task {
 			 plint nStep);
   protected:
     void setVal(Array<T,2> physVal);
-    SetVelocityBc(PlbXmlController2D const *controller, Box2D const &reg_, Array<T,2> const &val);
+    SetVelocityBc(PlbXmlController2D const *controller, Box2D const &reg_,
+		  Array<T,2> const &val, plint id);
   private:
     Box2D reg;
     Array<T,2> val;    

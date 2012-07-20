@@ -101,6 +101,7 @@ namespace Action {
 	actPtr->addTask(Task::cont.f.create(controller, p));
       } while (v[i]->getNextId(id));
     }
+    actPtr->tasklist.sort();
     return Action2D(id,actPtr);
   }
 
