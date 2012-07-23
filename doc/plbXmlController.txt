@@ -270,8 +270,93 @@ geometrical descriptions.
 :link(linkActions)
 Actions :h2
 
-Actions documentation will have to wait until order of tasks in action
-tag is fixed ....
+Any operations on the lattice are defined in
+
+<action id="1">
+  <id>actionId</id>
+  <type>actionType args</type>
+  ....
+</action> :displayhtml,pre
+
+tags.
+
+[id] : The id of the action tag. :ulb,l
+[type] : Can either be {once t_once} or {periodic t_start t_period
+t_end}. The times have to be given in physical units. In case of
+periodic actions, a value of -1 for t_start or t_end means "always". :l
+:ule
+
+Every action tag may contain one or more tasks to be executed at the
+defined times. The ones currently implemented are documented below.
+
+<!-- setPressureBc and setVelocityBc -->
+
+setPressureBc and setVelocityBc :h3
+
+With these commands, a value can be assigned to a previously defined
+pressure or velocity boundary. 
+
+<setVelocityBc id="1">
+  <bcId>bcId</bcId>
+  <bcValue>vx vy</bcValue>
+</setVelocityBc> :displayhtml,pre
+
+sets the boundary {bcId} to {vx},{vy}. For a pressure boundary,
+obviously only one value needs to be specified.
+
+<!-- setPressureBcFromFile and setVelocityBcFromFile -->
+
+setPressureBcFromFile and setVelocityBcFromFile :h3
+
+These commands can be used to assign a time-dependent 
+velocity/pressure to a boundary. 
+
+<setPressureBcFromFile id="1">
+  <bcId>bcId</bcId>
+  <fileName>path/to/file</fileName>
+</setPressureBcFromFile> :displayhtml,pre
+
+The file needs to have the structure
+
+t1 p1
+t2 p2
+... :pre
+
+for pressure boundary conditions and
+
+t1 vx1 vy1
+t2 vx2 vy2
+... :pre
+
+for velocity boundary conditions.
+
+Before the first given time (t1) and after the last given time, the
+boundary will be kept fixed to that value. Otherwise, linear
+interpolation between the two closest time values will be used to
+determine the correct value for the boundary condition.
+
+
+<!-- writeVtk -->
+
+writeVtk :h3
+
+A tag like
+
+<writeVtk>
+  <fileName>out/vtk_</fileName>
+  <fileNameLength>3</fileNameLength>
+</writeVtk> :displayhtml,pre
+
+inside an action tag will write an output file {out/vtk_nStep.vti}
+with {nStep} being replaced by the current time step number. The
+optional tag [fileNameLength] sets a minimum number of digits for
+nStep. The default is 8.
+
+
+        <setPressureBc id="0">
+            <bcId>outlet</bcId>
+            <bcValue>2</bcValue>
+        </setPressureBc> :displayhtml,pre
 
 <!-------------------------------------------------------
    Running
@@ -285,4 +370,5 @@ Running a simulation is simple: The tag
 
 <run>12.3</run> :displayhtml,pre
 
-will run the simulation for 12.3 seconds of physical time.
+will run the simulation for 12.3 seconds of physical time. Note: There
+can only be one run tag per input file!
