@@ -1,6 +1,7 @@
 /* --------------------------------------------------------------------- 
 
-Copyright 2012 Philippe Seil
+Copyright 2012 JKU Linz
+Author: Philippe Seil (philippe.seil@jku.at)
 
 This file is part of plbXml.
 
