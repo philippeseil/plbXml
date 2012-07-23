@@ -41,8 +41,20 @@ int main(int argc, char **argv)
   plb::plbInit(&argc,&argv);
 
   std::string fName;
-  global::argv(1).readNoThrow(fName);
+  try{
+    global::argv(1).readNoThrow(fName);
+  } catch(PlbIOException &e) {
+    pcout << "No input file specified" << std::endl;
+    return 1;
+  }
 
+  std::ifstream test(fName.c_str());
+  if(test.good()){
+    test.close();
+  } else{
+    pcout << "Input file " << fName << " not found" << std::endl;
+    return 1;
+  }
   PlbXmlController2D p(fName);
   plint n = p.getNumSteps();
   p.run(n);

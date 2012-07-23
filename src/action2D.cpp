@@ -32,7 +32,14 @@ namespace Action {
   ActionClass2D::ActionClass2D(PlbXmlController2D const *controller_)
     : controller(controller_) {}
 
-  ActionClass2D::~ActionClass2D() {}
+  ActionClass2D::~ActionClass2D()
+  {
+    for(Task::TaskListConstIterator tlIt = tasklist.begin();
+	tlIt != tasklist.end(); ++tlIt){
+      delete (*tlIt);
+    }
+    
+  }
 
   Task::TaskList const & ActionClass2D::getTaskList() const
   {

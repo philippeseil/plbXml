@@ -92,10 +92,6 @@ LBconverter<T> PlbXmlController2D::calcUnits()
 			physRho, // physical density of fluid
 			pressureLevel); // an additive pressure level
 
-  pcout << "Characteristic Length   : " << units_.getCharL() << "\n"
-	<< "Characteristic Velocity : " << units_.getCharU() << "\n"
-	<< "Characteristic Time     : " << units_.getCharTime() << std::endl;
-
   return units_;
 }
 
@@ -114,11 +110,6 @@ IncomprFlowParam<T> PlbXmlController2D::calcParams()
   ly /= units.getCharL();
 
   IncomprFlowParam<T> params_(1.,units.getLatticeU(),units.getRe(),1.,res,lx,ly);
-
-  pcout << "Lattice size    : " << params_.getNx() << " " << params_.getNy() << std::endl;
-  pcout << "Reynolds number : " << params_.getRe() << std::endl;
-  pcout << "Lattice U       : " << params_.getLatticeU()<< std::endl;
-  pcout << "omega           : " << params_.getOmega() << std::endl;
 
   return params_;
 }
@@ -362,6 +353,20 @@ PlbXmlController2D::PlbXmlController2D(std::string &fname)
     boundaryCondition(createBoundaryCondition()),
     nSteps(0), iStep(0)
 {
+  pcout << PLBXML_VERSION_STRING << std::endl << std::endl;
+
+  pcout << "reading case from file " << fname << std::endl << std::endl;
+
+  pcout << "Characteristic Length   : " << units.getCharL() << "\n"
+	<< "Characteristic Velocity : " << units.getCharU() << "\n"
+	<< "Characteristic Time     : " << units.getCharTime() << std::endl;
+
+  pcout << "Lattice size    : " << params.getNx() << " " << params.getNy() << std::endl;
+  pcout << "Reynolds number : " << params.getRe() << std::endl;
+  pcout << "Lattice U       : " << params.getLatticeU()<< std::endl;
+  pcout << "omega           : " << params.getOmega() << std::endl;
+
+
   buildRegionList();
   buildBoundaryList();
   buildActionList();
@@ -380,6 +385,9 @@ PlbXmlController2D::PlbXmlController2D(std::string &fname)
 
 PlbXmlController2D::~PlbXmlController2D()
 {
-
+  for(ActionListIterator it=actionList.begin(); it != actionList.end(); ++it){
+    delete it->second;
+  }
+  delete boundaryCondition;
 }
 

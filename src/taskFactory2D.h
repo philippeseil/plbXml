@@ -54,6 +54,7 @@ namespace Task {
     TaskBase* create(PlbXmlController2D const *controller,
 		     XMLreaderProxy const &t);
 
+    ~TaskFactory();
   private:
     typedef std::map<std::string,SingleTaskFactoryBase*> TaskMap;
     TaskMap taskMap;

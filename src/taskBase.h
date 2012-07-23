@@ -36,11 +36,11 @@ namespace Task {
   protected:
     TaskBase(PlbXmlController2D const *controller_, int id_) 
       : controller(controller_), id(id_) {}
-    virtual ~TaskBase() {}
     PlbXmlController2D const *controller;
   public:
     virtual void perform(MultiBlockLattice2D<T,DESCRIPTOR> &lattice, 
 			 plint nStep) =0;
+    virtual ~TaskBase() {}
 
     int id;
 

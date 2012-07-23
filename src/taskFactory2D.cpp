@@ -36,6 +36,11 @@ namespace Task{
   {
     #include "taskFactoryInitializer2D.hh"
   }
+  TaskFactory::~TaskFactory()
+  {
+    for ( TaskMap::iterator it=taskMap.begin() ; it != taskMap.end(); it++ )
+      delete it->second;
+  }
 
   TaskBase* TaskFactory::create(PlbXmlController2D const *controller,
 				XMLreaderProxy const &t)
