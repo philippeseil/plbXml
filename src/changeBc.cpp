@@ -88,7 +88,7 @@ namespace Task{
   {
     T tTmp,pTmp;
     std::string fname;
-    r["valFile"].read(fname);
+    r["fileName"].read(fname);
 
     std::ifstream file(fname.c_str());
 
@@ -203,7 +203,7 @@ namespace Task{
     T tTmp,vxTmp,vyTmp;
 
     std::string fname;
-    r["valFile"].read(fname);
+    r["fileName"].read(fname);
     std::ifstream file(fname.c_str());
 
     while(!file.eof()){
