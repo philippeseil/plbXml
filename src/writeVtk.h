@@ -48,6 +48,7 @@ private:
   private:
     LBconverter<T> const &units;
   };
+  plint fileNameLength;
     
 
 };

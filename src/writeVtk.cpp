@@ -22,15 +22,19 @@ along with plbXml. If not, see http://www.gnu.org/licenses/.
 
 #include "writeVtk.h"
 #include "plbXmlController2D.h"
+#include "ioUtils.h"
+
 namespace Task {
   WriteVtk::WriteVtk(PlbXmlController2D const *controller, XMLreaderProxy const &r)
-    : TaskBase(controller,r.getId())
+    : TaskBase(controller,r.getId()), fileNameLength(8)
   {
     try{
       r["fileName"].read(prefix);
     } catch(PlbIOException &e) {
       plbIOError("No file name for VTK output specified");
     }
+    if(ioUtils::elementExists(r,"fileNameLength"))
+      r["fileNameLength"].read(fileNameLength);
   }
 
   WriteVtk::~WriteVtk()
@@ -50,7 +54,7 @@ namespace Task {
   {
     T dx = controller->getParams().getDeltaX();
     T physU = controller->getUnits().physVelocity();
-    std::string fname = createFileName(prefix, nStep, 12);
+    std::string fname = createFileName(prefix, nStep, fileNameLength);
     VtkImageOutput2D<T> vtkOut(fname, dx);
     
     std::auto_ptr<MultiScalarField2D<T> > density = computeDensity(lattice);
