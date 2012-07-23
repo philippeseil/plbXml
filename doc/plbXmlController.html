@@ -288,9 +288,94 @@ geometrical descriptions.
 
 <H2>Actions 
 </H2>
-<P>Actions documentation will have to wait until order of tasks in action
-tag is fixed ....
+<P>Any operations on the lattice are defined in
 </P>
+<PRE>&lt;action id=&quot;1&quot;&gt;
+  &lt;id&gt;actionId&lt;/id&gt;
+  &lt;type&gt;actionType args&lt;/type&gt;
+  ....
+&lt;/action&gt; 
+</PRE>
+<P>tags.
+</P>
+<UL><LI><B>id</B> : The id of the action tag. 
+
+<LI><B>type</B> : Can either be <I>once t_once</I> or <I>periodic t_start t_period
+t_end</I>. The times have to be given in physical units. In case of
+periodic actions, a value of -1 for t_start or t_end means "always". 
+
+
+</UL>
+<P>Every action tag may contain one or more tasks to be executed at the
+defined times. The ones currently implemented are documented below.
+</P>
+<!-- setPressureBc and setVelocityBc -->
+
+<H3>setPressureBc and setVelocityBc 
+</H3>
+<P>With these commands, a value can be assigned to a previously defined
+pressure or velocity boundary. 
+</P>
+<PRE>&lt;setVelocityBc id=&quot;1&quot;&gt;
+  &lt;bcId&gt;bcId&lt;/bcId&gt;
+  &lt;bcValue&gt;vx vy&lt;/bcValue&gt;
+&lt;/setVelocityBc&gt; 
+</PRE>
+<P>sets the boundary <I>bcId</I> to <I>vx</I>,<I>vy</I>. For a pressure boundary,
+obviously only one value needs to be specified.
+</P>
+<!-- setPressureBcFromFile and setVelocityBcFromFile -->
+
+<H3>setPressureBcFromFile and setVelocityBcFromFile 
+</H3>
+<P>These commands can be used to assign a time-dependent 
+velocity/pressure to a boundary. 
+</P>
+<PRE>&lt;setPressureBcFromFile id=&quot;1&quot;&gt;
+  &lt;bcId&gt;bcId&lt;/bcId&gt;
+  &lt;fileName&gt;path/to/file&lt;/fileName&gt;
+&lt;/setPressureBcFromFile&gt; 
+</PRE>
+<P>The file needs to have the structure
+</P>
+<PRE>t1 p1
+t2 p2
+... 
+</PRE>
+<P>for pressure boundary conditions and
+</P>
+<PRE>t1 vx1 vy1
+t2 vx2 vy2
+... 
+</PRE>
+<P>for velocity boundary conditions.
+</P>
+<P>Before the first given time (t1) and after the last given time, the
+boundary will be kept fixed to that value. Otherwise, linear
+interpolation between the two closest time values will be used to
+determine the correct value for the boundary condition.
+</P>
+<!-- writeVtk -->
+
+<H3>writeVtk 
+</H3>
+<P>A tag like
+</P>
+<PRE>&lt;writeVtk&gt;
+  &lt;fileName&gt;out/vtk_&lt;/fileName&gt;
+  &lt;fileNameLength&gt;3&lt;/fileNameLength&gt;
+&lt;/writeVtk&gt; 
+</PRE>
+<P>inside an action tag will write an output file <I>out/vtk_nStep.vti</I>
+with <I>nStep</I> being replaced by the current time step number. The
+optional tag <B>fileNameLength</B> sets a minimum number of digits for
+nStep. The default is 8.
+</P>
+<PRE>        &lt;setPressureBc id=&quot;0&quot;&gt;
+            &lt;bcId&gt;outlet&lt;/bcId&gt;
+            &lt;bcValue&gt;2&lt;/bcValue&gt;
+        &lt;/setPressureBc&gt; 
+</PRE>
 <!-------------------------------------------------------
    Running
   ------------------------------------------------------>
@@ -305,6 +390,7 @@ tag is fixed ....
 </P>
 <PRE>&lt;run&gt;12.3&lt;/run&gt; 
 </PRE>
-<P>will run the simulation for 12.3 seconds of physical time.
+<P>will run the simulation for 12.3 seconds of physical time. Note: There
+can only be one run tag per input file!
 </P>
 </HTML>

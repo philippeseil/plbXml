@@ -1,5 +1,5 @@
 ##########################################################################
-## Makefile for the Palabos example program readParameters.
+## Makefile for the Palabos part of plbXml
 ##
 ## The present Makefile is a pure configuration file, in which 
 ## you can select compilation options. Compilation dependencies
@@ -17,13 +17,13 @@
 # Leading directory of the Palabos source code
 palabosRoot   = ${PALABOS_ROOT}
 # Name of source files in current directory to compile and link with Palabos
-# FILELIST will be set and exported in Makefile
-projectFiles = ${PLBXML_FILELIST}
+# PLBXML_FILELIST will be set and exported in Makefile
+projectFiles = plbXml.cpp ${PLBXML_FILELIST}
 
 # Set optimization flags on/off
-optimize     = true
+optimize     = false
 # Set debug mode and debug flags on/off
-debug        = false
+debug        = true
 # Set profiling flags on/off
 profile      = false
 # Set MPI-parallel mode on/off (parallelism in cluster-like environment)

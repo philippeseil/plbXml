@@ -1,3 +1,26 @@
+/* --------------------------------------------------------------------- 
+
+Copyright 2012 JKU Linz
+Author: Philippe Seil (philippe.seil@jku.at)
+
+This file is part of plbXml.
+
+plbXml is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 2 of the License, or (at
+your option) any later version.
+
+plbXml is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with plbXml. If not, see http://www.gnu.org/licenses/.
+
+---------------------------------------------------------------------- */
+
+
 
 #include "plbXmlController2D.h"
 #include "ioUtils.h"
@@ -69,10 +92,6 @@ LBconverter<T> PlbXmlController2D::calcUnits()
 			physRho, // physical density of fluid
 			pressureLevel); // an additive pressure level
 
-  pcout << "Characteristic Length   : " << units_.getCharL() << "\n"
-	<< "Characteristic Velocity : " << units_.getCharU() << "\n"
-	<< "Characteristic Time     : " << units_.getCharTime() << std::endl;
-
   return units_;
 }
 
@@ -91,11 +110,6 @@ IncomprFlowParam<T> PlbXmlController2D::calcParams()
   ly /= units.getCharL();
 
   IncomprFlowParam<T> params_(1.,units.getLatticeU(),units.getRe(),1.,res,lx,ly);
-
-  pcout << "Lattice size    : " << params_.getNx() << " " << params_.getNy() << std::endl;
-  pcout << "Reynolds number : " << params_.getRe() << std::endl;
-  pcout << "Lattice U       : " << params_.getLatticeU()<< std::endl;
-  pcout << "omega           : " << params_.getOmega() << std::endl;
 
   return params_;
 }
@@ -317,6 +331,7 @@ void PlbXmlController2D::performActions(plint step)
   for(ActionListIterator it=actionList.begin(); it != actionList.end(); ++it){
     if((it->second)->performAtStep(step)){
       Task::TaskList const t = (it->second)->getTaskList();
+      pcout << "Performing action " << it->first << " at step " << step << std::endl;
       for(Task::TaskListConstIterator tlIt = t.begin();
 	 tlIt != t.end(); ++tlIt){
 	(*tlIt)->perform(lattice,step);
@@ -338,6 +353,20 @@ PlbXmlController2D::PlbXmlController2D(std::string &fname)
     boundaryCondition(createBoundaryCondition()),
     nSteps(0), iStep(0)
 {
+  pcout << PLBXML_VERSION_STRING << std::endl << std::endl;
+
+  pcout << "reading case from file " << fname << std::endl << std::endl;
+
+  pcout << "Characteristic Length   : " << units.getCharL() << "\n"
+	<< "Characteristic Velocity : " << units.getCharU() << "\n"
+	<< "Characteristic Time     : " << units.getCharTime() << std::endl;
+
+  pcout << "Lattice size    : " << params.getNx() << " " << params.getNy() << std::endl;
+  pcout << "Reynolds number : " << params.getRe() << std::endl;
+  pcout << "Lattice U       : " << params.getLatticeU()<< std::endl;
+  pcout << "omega           : " << params.getOmega() << std::endl;
+
+
   buildRegionList();
   buildBoundaryList();
   buildActionList();
@@ -356,6 +385,9 @@ PlbXmlController2D::PlbXmlController2D(std::string &fname)
 
 PlbXmlController2D::~PlbXmlController2D()
 {
-
+  for(ActionListIterator it=actionList.begin(); it != actionList.end(); ++it){
+    delete it->second;
+  }
+  delete boundaryCondition;
 }
 
