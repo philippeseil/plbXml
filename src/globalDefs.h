@@ -28,7 +28,7 @@ along with plbXml. If not, see http://www.gnu.org/licenses/.
 #ifndef GLOBALDEFS_H_LBDEM
 #define GLOBALDEFS_H_LBDEM
 
-#define PLBXML_VERSION_STRING "plbXml version 0.1 (c) JKU Linz 2012\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+#define PLBXML_VERSION_STRING "plbXml version 0.1.1 (c) JKU Linz 2012\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 typedef double T;
 
