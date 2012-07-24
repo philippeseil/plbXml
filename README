@@ -1,4 +1,4 @@
-This is plbXml version 0.1
+This is plbXml version 0.1.1
 
 plbXml is an XML scripting frontend to the lattice Boltzmann library
 Palabos (www.palabos.org). It aims at providing low-level scripting
