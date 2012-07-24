@@ -353,7 +353,10 @@ PlbXmlController2D::PlbXmlController2D(std::string const &fname)
     boundaryCondition(createBoundaryCondition()),
     nSteps(0), iStep(0)
 {
-  pcout << PLBXML_VERSION_STRING << std::endl << std::endl;
+  std::string versionString(PLBXML_VERSION_STRING);
+  pcout << PLBXML_VERSION_STRING << std::endl;
+  for(int i=0;i<versionString.size();i++) pcout << "~";
+  pcout << std::endl << std::endl;
 
   pcout << "reading case from file " << fname << std::endl << std::endl;
 
