@@ -59,7 +59,7 @@ using namespace Boundary;
 
 class PlbXmlController2D {
 public:
-  PlbXmlController2D(std::string &fname);
+  PlbXmlController2D(std::string const &fname);
   ~PlbXmlController2D();
 
   const IncomprFlowParam<T>& getParams() const;

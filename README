@@ -1,4 +1,4 @@
-This is plbXml version 0.1
+This is plbXml version 0.1.1
 
 plbXml is an XML scripting frontend to the lattice Boltzmann library
 Palabos (www.palabos.org). It aims at providing low-level scripting
@@ -9,8 +9,13 @@ philippe.seil@jku.at
 
 Installation instructions:
 
-* make sure you have a copy of Palabos on your system.  set the shell
-* variable $PALABOS_ROOT to your palabos directory Enter the src/
-* folder and type "make". After the compilation, you will find the
-   executable plbXml in the src directory.
-* Get started with any of the examples.
+* make sure you have a copy of Palabos on your system.  
+
+* set the shell variable $PALABOS_ROOT to your palabos directory
+
+* Enter the src/ folder and type "make". After the compilation, you
+ will find the executable plbXml in the src directory.  Get started
+ with any of the examples.
+
+* Additional compilation targets "clean", "debug" and "profile" exist
+  for obvious purposes
