@@ -8,6 +8,11 @@ TMP=tmp.txt
 
 rm -f $HEADER $INITIALIZER $SRC_TMP > /dev/null 2> /dev/null;
 
+if [ $1 = clean ]
+then
+    exit 0
+fi
+
 ls *.cpp | grep -v plbXml.cpp | tr '\n' ' ' > $SRC_TMP
 
 
