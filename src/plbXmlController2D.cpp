@@ -346,7 +346,7 @@ void PlbXmlController2D::performActions(plint step)
  * -----------------------------------------------------------------
  */
 
-PlbXmlController2D::PlbXmlController2D(std::string &fname)
+PlbXmlController2D::PlbXmlController2D(std::string const &fname)
   : reader(fname), plbCase(reader["plbCase"]),
     units(calcUnits()), params(calcParams()), 
     lattice(params.getNx(),params.getNy(),new NoDynamics<T,DESCRIPTOR>()),

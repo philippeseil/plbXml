@@ -31,7 +31,7 @@ along with plbXml. If not, see http://www.gnu.org/licenses/.
 using namespace plb;
 
 namespace Task{
-
+  
   TaskFactory::TaskFactory()
   {
     #include "taskFactoryInitializer2D.hh"
