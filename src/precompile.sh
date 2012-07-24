@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 INITIALIZER=taskFactoryInitializer2D.hh
 HEADER=taskFactoryAggregateHeader2D.hh
@@ -8,7 +8,7 @@ TMP=tmp.txt
 
 rm -f $HEADER $INITIALIZER $SRC_TMP > /dev/null 2> /dev/null;
 
-if [ $1 = clean ]
+if [ "$1" == "clean" ]
 then
     exit 0
 fi
