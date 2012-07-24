@@ -1,0 +1,127 @@
+<!--
+Copyright 2012 JKU Linz
+
+This file is part of plbXml.
+
+plbXml is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 2 of the License, or (at
+your option) any later version.
+
+plbXml is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with plbXml. If not, see http://www.gnu.org/licenses/.
+-->
+
+
+<!--
+
+Pressure driven flow through porous media read from a file. The 
+geometry file is created by the octave script createGeometry.m
+
+-->
+
+<plbCase>
+  <!-- basic physical parameters -->
+  <parameters>
+    <physL>0.1</physL> <!-- characteristic size -->
+    <physU>1</physU> <!-- characteristic velocity -->
+    <physNu>1e-5</physNu>
+    <physRho>1000.</physRho>
+    <pressureLevel>0.</pressureLevel>
+    
+    <latticeU>0.02</latticeU>
+    <resolution>100</resolution> <!-- number of grid points per physL -->
+    
+    <lx>0.1</lx>
+    <ly>0.3</ly>
+  </parameters>
+
+  <!-- region definitions -->
+  <region id="0">
+    <id>domain</id>
+    <x0>0</x0>
+    <x1>100</x1>
+    <y0>0</y0>
+    <y1>300</y1>
+  </region>
+	
+  <region id="1">
+    <id>inletRegion</id>
+    <x0>1</x0>
+    <x1>99</x1>
+    <y0>0</y0>
+    <y1>0</y1>
+  </region>
+
+  <region id="2">
+    <id>outletRegion</id>
+    <x0>1</x0>
+    <x1>99</x1>
+    <y0>300</y0>
+    <y1>300</y1>
+  </region>
+
+  <!-- define dynamics from regions -->
+  <dynamicsFromFile id="1">
+    <fileName>domain.txt</fileName>
+    <!-- when encountering a 0 in domain.txt, create 
+    Smagorinsky dynamics -->
+    <maskVal>0</maskVal>
+    <type>SmagorinskyRegularized 0.15</type>
+  </dynamicsFromFile>
+  <dynamicsFromFile id="2">
+    <fileName>domain.txt</fileName>
+    <!-- when encountering a 0 in domain.txt, create 
+    bounce back dynamics -->
+    <maskVal>1</maskVal>
+    <type>BounceBack</type>
+  </dynamicsFromFile>
+
+  <!-- define boundary condition algorithm -->
+  <bcType>interpolation</bcType>
+
+  <!-- define boundaries -->
+  <boundary id="1">
+    <id>inlet</id>
+    <regionId>inletRegion</regionId>
+    <type>pressure dirichlet</type>
+  </boundary>
+  <boundary id="2">
+    <id>outlet</id>
+    <regionId>outletRegion</regionId>
+    <type>pressure dirichlet</type>
+  </boundary>
+
+  <!--
+  set boundary condition to desired values: apply a pressure difference
+  of 10 pascal
+  -->
+  <action id="1">
+    <id>set</id>
+    <type>once 0</type>
+    <setPressureBc id="1">
+      <bcId>inlet</bcId>
+      <bcValue>10000</bcValue>
+    </setPressureBc>
+    <setPressureBc id="2">
+      <bcId>outlet</bcId>
+      <bcValue>0</bcValue>
+    </setPressureBc>
+  </action>
+
+  <!-- write a vtk file every 0.05 seconds of physical simulation time -->
+  <action id="3">
+    <id>write</id>
+    <type>periodic 0 0.05 -1</type>
+    <writeVtk>
+      <fileName>out/vtk_</fileName>
+    </writeVtk>
+  </action>
+  
+  <run>10.0</run>
+</plbCase>
