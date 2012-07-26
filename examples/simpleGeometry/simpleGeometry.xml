@@ -19,7 +19,8 @@ along with plbXml. If not, see http://www.gnu.org/licenses/.
 
 
 <!--
-Pressure driven flow past a rectangular obstacle
+Flow past a rectangular obstacle
+at Reynolds number Re=100 w.r.t. obstacle width
 Obstacle width: 0.01 m, channel width: 0.05 m
 -->
 
@@ -35,7 +36,7 @@ Obstacle width: 0.01 m, channel width: 0.05 m
     <latticeU>0.02</latticeU>
     <resolution>10</resolution> <!-- number of grid points per physL -->
     
-    <lx>0.05</lx>
+    <lx>0.05</lx> <!-- will result in 51x101 lattice -->
     <ly>0.1</ly>
   </parameters>
 
@@ -137,10 +138,7 @@ Obstacle width: 0.01 m, channel width: 0.05 m
     <type>velocity neumann</type>
   </boundary>
 
-  <!--
-  set boundary condition to desired values: apply a pressure difference
-  of 10 pascal
-  -->
+  <!-- set inlet velocity to 0.1 m/s -->
   <action id="1">
     <id>set</id>
     <type>once 0</type>
@@ -148,15 +146,11 @@ Obstacle width: 0.01 m, channel width: 0.05 m
       <bcId>inlet</bcId>
       <bcValue>0. 0.1</bcValue>
     </setVelocityBc>
-<!--    <setPressureBc id="2">
-      <bcId>outlet</bcId>
-      <bcValue>0</bcValue>
-    </setPressureBc>-->
   </action>
 
 
 
-  <!-- write a vtk file every 0.1 seconds of physical simulation time -->
+  <!-- write a vtk file every 0.01 seconds of physical simulation time -->
   <action id="2">
     <id>write</id>
     <type>periodic 0 0.01 -1</type>
