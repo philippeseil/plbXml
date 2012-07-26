@@ -5,6 +5,7 @@ clear
 nx = 301;
 ny = 101;
 
+% solid fraction of the domain
 fs = 0.1;
 
 domain = zeros(nx,ny);
@@ -14,7 +15,11 @@ domain(:,[1,ny]) = 1;
 
 ind = zeros(nx,ny);
 % create random porous media in middle of domain
-ind(51:251,:) = rand(201,ny) < fs;
+xl = ceil(ny/2);
+xh = ceil(nx - ny/2);
+dx = xh - xl;
+
+ind(xl:xh,:) = rand(dx+1,ny) < fs;
 domain = ind | domain;
 
 f = fopen("domain.txt","w+");

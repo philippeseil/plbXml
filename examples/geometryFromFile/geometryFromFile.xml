@@ -99,14 +99,14 @@ geometry file is created by the octave script createGeometry.m
 
   <!--
   set boundary condition to desired values: apply a pressure difference
-  of 10 pascal
+  of 1e4 pascal
   -->
   <action id="1">
     <id>set</id>
     <type>once 0</type>
     <setPressureBc id="1">
       <bcId>inlet</bcId>
-      <bcValue>10000</bcValue>
+      <bcValue>1e4</bcValue>
     </setPressureBc>
     <setPressureBc id="2">
       <bcId>outlet</bcId>
