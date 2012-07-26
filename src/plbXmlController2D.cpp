@@ -176,6 +176,8 @@ Dynamics<T,DESCRIPTOR>* PlbXmlController2D::dynamicsFromXML(XMLreaderProxy dyn)
     return new BounceBack<T,DESCRIPTOR>();
   if(type[0].compare("NoDynamics") == 0)
     return new NoDynamics<T,DESCRIPTOR>();
+
+  plbIOError("Unknown dynamics type " + type[0]);
   
   return 0;
 }
