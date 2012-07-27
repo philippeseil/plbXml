@@ -1,8 +1,8 @@
-PlbXmlController :h1
+plbXml :h1
 
 :line
 
-This is the documentation for the project PlbXmlController, an XML frontend
+This is the documentation for the project plbXml,  an XML front end
  for the Lattice Boltzmann library "Palabos"_plbLink. 
 
 :link(plbLink,http://www.palabos.org)
@@ -16,6 +16,7 @@ This is the documentation for the project PlbXmlController, an XML frontend
 Table of Contents :h2
 
 "Introduction"_#linkIntroduction 
+"Units"_#linkUnits
 "Parameters"_#linkParameters
 "Regions"_#linkRegions 
 "Boundary Conditions"_#linkBoundaryConditions
@@ -32,7 +33,7 @@ Table of Contents :h2
 :link(linkIntroduction)
 Introduction :h2
 
-The purpose of PlbXmlController is to give scripting access to the
+The purpose of plbXml is to give scripting access to the
 Palabos library. All input files that can be understood by
 PlbXmlController are therefor *.xml files that need to contain certain
 tags that will be explained below. A case is always defined inside the tag :b 
@@ -72,6 +73,18 @@ with the <id>someid</id> tag. The former is only internally used to
 discriminate between different tags of the same type and does not have
 any other effect on the user, while the latter is a handle for the
 user to refer to some distinct element within the case. :displayhtml
+<!------------------------------------------------------
+  units
+  ----------------------------------------------------->
+
+:line
+:link(linkUnits)
+Units :h2
+
+Units are a major source of confusion in lattice Boltzmann
+methods. Therefor, the conversion is encapsulated in the code and,
+with a few tiny exceptions, all values given to plbXml are assumed to
+be in SI units.
 
 
 <!------------------------------------------------------ 
@@ -143,6 +156,9 @@ defined as follows:
 [x0], [x1], [y0], [y1] : Beginning and end of region in x and y
 direction. Both points are included in the region, :l
 :ule
+
+The values for x0,x1,y0,y1 are assumed to be positive integers,
+denoting grid points.
 
 <!------------------------------------------------------
    Boundary conditions
