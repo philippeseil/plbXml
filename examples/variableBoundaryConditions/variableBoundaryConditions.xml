@@ -1,0 +1,127 @@
+
+<plbCase>
+  <parameters>
+    <physL>0.1</physL> <!-- characteristic size -->
+    <physU>1</physU> <!-- characteristic velocity -->
+    <physNu>1e-5</physNu>
+    <physRho>1000.</physRho>
+    <pressureLevel>0.</pressureLevel>
+    
+    <latticeU>0.02</latticeU>
+    <resolution>100</resolution> <!-- number of grid points per physL -->
+    
+    <lx>0.7</lx>
+    <ly>0.1</ly>
+  </parameters>
+
+
+  <region id="0">
+    <id>domain</id>
+    <x0>0</x0>
+    <x1>700</x1>
+    <y0>0</y0>
+    <y1>100</y1>
+  </region>
+	
+  <region id="1">
+    <id>mainInletRegion</id>
+    <x0>0</x0>
+    <x1>0</x1>
+    <y0>1</y0>
+    <y1>99</y1>
+  </region>
+
+  <region id="2">
+    <id>outletRegion</id>
+    <x0>700</x0>
+    <x1>700</x1>
+    <y0>1</y0>
+    <y1>99</y1>
+  </region>
+
+  <region id="4">
+    <id>topInletRegion</id>
+    <x0>101</x0>
+    <x1>150</x1>
+    <y0>100</y0>
+    <y1>100</y1>
+  </region>
+
+  <bcType>interpolation</bcType>
+
+  <boundary id="1">
+    <id>inlet</id>
+    <regionId>mainInletRegion</regionId>
+    <type>velocity dirichlet</type>
+  </boundary>
+  <boundary id="2">
+    <id>outlet</id>
+    <regionId>outletRegion</regionId>
+    <type>pressure dirichlet</type>
+  </boundary>
+  <boundary id="3">
+    <id>topInlet</id>
+    <regionId>topInletRegion</regionId>
+    <type>velocity dirichlet</type>
+  </boundary>
+
+  <dynamicsFromFile id="1">
+    <fileName>domain.txt</fileName>
+    <!-- when encountering a 0 in domain.txt, create 
+    Smagorinsky dynamics -->
+    <maskVal>0</maskVal>
+    
+     <type>SmagorinskyRegularized 0.14</type>
+  </dynamicsFromFile>
+  <dynamicsFromFile id="2">
+    <fileName>domain.txt</fileName>
+    <!-- when encountering a 1 in domain.txt, create 
+    bounce back dynamics -->
+    <maskVal>1</maskVal>
+    <type>BounceBack</type>
+  </dynamicsFromFile>
+  <dynamicsFromFile id="2">
+    <fileName>domain.txt</fileName>
+    <!-- when encountering a 2 in domain.txt, create 
+    no dynamics -->
+    <maskVal>2</maskVal>
+    <type>NoDynamics</type>
+  </dynamicsFromFile>
+
+  <action id="1">
+    <id>setup</id>
+    <type>once 0</type>
+    <setVelocityBc id="1">
+      <bcId>inlet</bcId>
+      <bcValue>0.2 0</bcValue>
+    </setVelocityBc>
+    <setVelocityBc id="2">
+      <bcId>topInlet</bcId>
+      <bcValue>0.707 -0.707</bcValue>
+    </setVelocityBc>
+    <setPressureBc id="1">
+      <bcId>outlet</bcId>
+      <bcValue>0</bcValue>
+    </setPressureBc>
+  </action>
+
+  <action id="2">
+    <id>wobblingJet</id>
+    <type>periodic 0 0.0001 -1</type>
+    <setVelocityBcFromFile id="1">
+      <bcId>topInlet</bcId>
+      <fileName>vTop.txt</fileName>
+    </setVelocityBcFromFile>
+  </action>
+
+  <!-- write a vtk file every 0.01 seconds of physical simulation time -->
+  <action id="3">
+    <id>write</id>
+    <type>periodic 0 0.01 -1</type>
+    <writeVtk>
+      <fileName>out2/vtk_</fileName>
+    </writeVtk>
+  </action>
+
+  <run> 10.0 </run>
+</plbCase>

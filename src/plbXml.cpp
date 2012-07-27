@@ -52,7 +52,8 @@ int main(int argc, char **argv)
   if(test.good()){
     test.close();
   } else{
-    pcout << "Input file " << fName << " not found" << std::endl;
+    pcout << "Input file " << fName 
+	  << " not found. Usage: plbXml [infile.xml]" << std::endl;
     return 1;
   }
   PlbXmlController2D p(fName);
